@@ -1,0 +1,61 @@
+name: Deploy Laravel to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+
+      - name: Install Composer dependencies
+        run: |
+          cd core
+          composer install --no-dev --optimize-autoloader
+
+      - name: Prepare Laravel for production
+        run: |
+          cd core
+          php artisan key:generate --force || true
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy to Hostinger via rsync over SSH
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          REMOTE_PATH: ${{ secrets.REMOTE_PATH }}
+          REMOTE_PORT: ${{ secrets.REMOTE_PORT }}
+        run: |
+          # Remove protocol prefix from HOST if present
+          CLEAN_HOST=$(echo "$HOST" | sed 's|^[a-z]*://||')
+          PORT=${REMOTE_PORT:-22}
+          echo "Connecting to: $CLEAN_HOST on port $PORT"
+          
+          sshpass -p "$PASSWORD" rsync -avzr --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='storage/logs' \
+            --exclude='.env' \
+            --exclude='vendor/**/.git' \
+            -e "ssh -o StrictHostKeyChecking=no -p $PORT" \
+            ./ "$USERNAME@$CLEAN_HOST:$REMOTE_PATH/"
+

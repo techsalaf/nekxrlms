@@ -1,0 +1,342 @@
+{
+    "dashboard": {
+        "keyword": [
+            "Dashboard",
+            "Home",
+            "Panel",
+            "Admin",
+            "Control center",
+            "Overview",
+            "Main hub",
+            "Management hub",
+            "Administrative hub",
+            "Central hub",
+            "Command center",
+            "Administrator portal",
+            "Centralized interface",
+            "Admin console",
+            "Management dashboard",
+            "Main screen",
+            "Administrative dashboard",
+            "Command dashboard",
+            "Main control panel"
+        ],
+        "title": "Dashboard",
+        "icon": "las la-home",
+        "route_name": "admin.dashboard",
+        "menu_active": "admin.dashboard"
+    },
+    "categories": {
+        "keyword": ["category", "categories", "category management", "category list", "category manage"],
+        "title": "Categories",
+        "icon": "las la-bars",
+        "route_name": "admin.category.index",
+        "menu_active": "admin.category.*"
+    },
+    "courses": {
+        "title": "Manage Course",
+        "icon": "la la-book-reader",
+        "menu_active": "admin.course*",
+        "submenu": [
+            {
+                "keyword": ["Free Courses", "Courses", "Course management", "Course control", "Course status", "Course activity"],
+                "title": "Free Courses",
+                "route_name": "admin.course.free",
+                "menu_active": "admin.course.free",
+                "params": {
+                    "user_id": ""
+                }
+            },
+            {
+                "keyword": ["Premium Courses", "Courses", "Course management", "Course activity"],
+                "title": "Premium Courses",
+                "route_name": "admin.course.premium",
+                "menu_active": "admin.course.premium",
+                "params": {
+                    "user_id": ""
+                }
+            },
+            {
+                "keyword": ["All Courses", "Courses", "Course management", "Course control", "Course activity"],
+                "title": "All Courses",
+                "route_name": "admin.course.all",
+                "menu_active": "admin.course.all",
+                "params": {
+                    "user_id": ""
+                }
+            },
+            {
+                "keyword": ["Course Page", "Courses", "Course management", "Course control", "Course activity"],
+                "title": "Course Page",
+                "route_name": "admin.course.page.video",
+                "menu_active": "admin.course.page.video",
+                "params": {
+                    "user_id": ""
+                }
+            }
+        ]
+    },
+    "coupons": {
+        "keyword": ["coupons", "coupon", "coupon management", "coupon list", "coupon manage"],
+        "title": "Coupons",
+        "icon": "las la-percent",
+        "route_name": "admin.coupon.index",
+        "menu_active": "admin.coupon.*"
+    },
+    "reviews": {
+        "keyword": ["reviews", "review", "review management", "review list", "review manage"],
+        "title": "Review",
+        "icon": "las la-star",
+        "route_name": "admin.course.reviews",
+        "menu_active": "admin.course.reviews"
+    },
+    "manage_users": {
+        "title": "Manage Users",
+        "icon": "las la-users",
+        "counters": ["bannedUsersCount", "emailUnverifiedUsersCount", "mobileUnverifiedUsersCount"],
+        "menu_active": "admin.users*",
+        "submenu": [{
+                "keyword": ["active users", "Manage Users", "User management", "User control", "User status", "User activity", "User analytics"],
+                "title": "Active Users",
+                "route_name": "admin.users.active",
+                "menu_active": "admin.users.active"
+            },
+            {
+                "keyword": ["banned users", "Manage Users", "User management", "Account bans", "User activity"],
+                "title": "Banned Users",
+                "route_name": "admin.users.banned",
+                "menu_active": "admin.users.banned",
+                "counter": "bannedUsersCount"
+            },
+            {
+                "keyword": ["email unverified users", "Manage Users", "User verification", "User authentication", "User management"],
+                "title": "Email Unverified",
+                "route_name": "admin.users.email.unverified",
+                "menu_active": "admin.users.email.unverified",
+                "counter": "emailUnverifiedUsersCount"
+            },
+            {
+                "keyword": ["mobile unverified users", "Manage Users", "User verification", "User authentication", "User management"],
+                "title": "Mobile Unverified",
+                "route_name": "admin.users.mobile.unverified",
+                "menu_active": "admin.users.mobile.unverified",
+                "counter": "mobileUnverifiedUsersCount"
+            },
+            {
+                "keyword": ["all users users", "Manage Users", "User management", "User control", "User activity", "User analytics"],
+                "title": "All Users",
+                "route_name": "admin.users.all",
+                "menu_active": "admin.users.all"
+            },
+            {
+                "keyword": ["send notification users", "Manage Users", "User notifications", "User management", "User activity"],
+                "title": "Send Notification",
+                "route_name": "admin.users.notification.all",
+                "menu_active": "admin.users.notification.all"
+            }
+        ]
+    },
+    "deposits": {
+        "title": "Payments",
+        "icon": "las la-file-invoice-dollar",
+        "counters": ["pendingDepositsCount"],
+        "menu_active": "admin.deposit*",
+        "submenu": [{
+                "keyword": ["Pending Payments", "Payments", "Payment management", "Payment control", "Payment status", "Payment activity"],
+                "title": "Pending Payments",
+                "route_name": "admin.deposit.pending",
+                "menu_active": "admin.deposit.pending",
+                "counter": "pendingDepositsCount",
+                "params":{
+                    "user_id":""
+                }
+            },
+            {
+                "keyword": ["Approved Payments", "Payments", "Payment management", "Payment activity"],
+                "title": "Approved Payments",
+                "route_name": "admin.deposit.approved",
+                "menu_active": "admin.deposit.approved",
+                "params":{
+                    "user_id":""
+                }
+            },
+            {
+                "keyword": ["Successful Payments", "Payments", "Payment management", "Payment activity"],
+                "title": "Successful Payments",
+                "route_name": "admin.deposit.successful",
+                "menu_active": "admin.deposit.successful",
+                "params":{
+                    "user_id":""
+                }
+            },
+            {
+                "keyword": ["Rejected Payments", "Payments", "Payment management", "Payment activity"],
+                "title": "Rejected Payments",
+                "route_name": "admin.deposit.rejected",
+                "menu_active": "admin.deposit.rejected",
+                "params":{
+                    "user_id":""
+                }
+            },
+            {
+                "keyword": ["Initiated Payments", "Payments", "Payment management", "Payment activity"],
+                "title": "Initiated Payments",
+                "route_name": "admin.deposit.initiated",
+                "menu_active": "admin.deposit.initiated",
+                "params":{
+                    "user_id":""
+                }
+            },
+            {
+                "keyword": ["All Payments", "Payments", "Payment management", "Payment control", "Payment activity"],
+                "title": "All Payments",
+                "route_name": "admin.deposit.list",
+                "menu_active": "admin.deposit.list",
+                "params":{
+                    "user_id":""
+                }
+            }
+        ]
+    },
+    "support_ticket": {
+        "title": "Support Ticket",
+        "icon": "la la-ticket",
+        "counters": ["pendingTicketCount"],
+        "menu_active": "admin.ticket*",
+        "submenu": [{
+                "keyword": ["Pending Ticket", "Support Ticket", "Ticket management", "Ticket control", "Ticket status", "Ticket activity"],
+                "title": "Pending Ticket",
+                "route_name": "admin.ticket.pending",
+                "menu_active": "admin.ticket.pending",
+                "counter": "pendingTicketCount"
+            },
+            {
+                "keyword": ["Closed Ticket", "Support Ticket", "Ticket management", "Ticket activity"],
+                "title": "Closed Ticket",
+                "route_name": "admin.ticket.closed",
+                "menu_active": "admin.ticket.closed"
+            },
+            {
+                "keyword": ["Answered Ticket", "Support Ticket", "Ticket management", "Ticket activity"],
+                "title": "Answered Ticket",
+                "route_name": "admin.ticket.answered",
+                "menu_active": "admin.ticket.answered"
+            },
+            {
+                "keyword": ["All Ticket", "Support Ticket", "Ticket management", "Ticket control", "Ticket activity"],
+                "title": "All Ticket",
+                "route_name": "admin.ticket.index",
+                "menu_active": "admin.ticket.index"
+            }
+        ]
+    },
+    "reports": {
+        "title": "Report",
+        "icon": "la la-list",
+        "menu_active": "admin.report*",
+        "submenu": [{
+                "keyword": ["Purchased Log", "Report", "Purchased report", "Purchased history", "Purchased activity","balance sheet","balance log","balance history"],
+                "title": "Purchased History",
+                "route_name": "admin.report.purchase.history",
+                "menu_active": ["admin.report.purchase.history", "admin.report.purchase.history.search"],
+                "params":{
+                    "user_id":""
+                }
+            },
+            {
+                "keyword": ["Login History", "Report", "Login report", "Login history", "Login activity"],
+                "title": "Login History",
+                "route_name": "admin.report.login.history",
+                "menu_active": ["admin.report.login.history", "admin.report.login.ipHistory"]
+            },
+            {
+                "keyword": ["Notification History", "Report", "Notification report", "Notification history", "Notification activity","email log","email history","sms log","sms history","push notification log","push notification history"],
+                "title": "Notification History",
+                "route_name": "admin.report.notification.history",
+                "menu_active": "admin.report.notification.history"
+            }
+        ]
+    },
+    "subscriber": {
+        "keyword": ["subscriber", "subscribers", "Subscription management", "Subscriber list", "Subscriber activity"],
+        "title": "Subscribers",
+        "icon": "las la-thumbs-up",
+        "route_name": "admin.subscriber.index",
+        "menu_active": "admin.subscriber.*"
+    },
+    "system_setting": {
+        "keyword": ["System Setting", "setting", "System configuration", "System preferences", "Configuration management", "System setup"],
+        "title": "System Setting",
+        "icon": "las la-life-ring",
+        "route_name": "admin.setting.system",
+        "menu_active": [
+            "admin.setting.system",
+            "admin.setting.general",
+            "admin.setting.socialite.credentials",
+            "admin.setting.system.configuration",
+            "admin.setting.logo.icon",
+            "admin.extensions.index",
+            "admin.language.manage",
+            "admin.language.key",
+            "admin.seo",
+            "admin.frontend.templates",
+            "admin.frontend.manage.*",
+            "admin.maintenance.mode",
+            "admin.setting.cookie",
+            "admin.setting.custom.css",
+            "admin.setting.sitemap",
+            "admin.setting.robot",
+            "admin.setting.notification.global.email",
+            "admin.setting.notification.global.sms",
+            "admin.setting.notification.global.push",
+            "admin.setting.notification.email",
+            "admin.setting.notification.sms",
+            "admin.setting.notification.push",
+            "admin.setting.notification.templates",
+            "admin.setting.notification.template.edit",
+            "admin.frontend.index",
+            "admin.frontend.sections*",
+            "admin.gateway*",
+            "admin.setting.app.purchase"
+        ]
+    },
+    "extra": {
+        "title": "Extra",
+        "icon": "la la-server",
+        "menu_active": "admin.system*",
+        "counters": ["updateAvailable"],
+        "submenu": [{
+                "keyword": ["Application", "System", "Application management", "Application settings", "System information","version","laravel","timezone"],
+                "title": "Application",
+                "route_name": "admin.system.info",
+                "menu_active": "admin.system.info"
+            },
+            {
+                "keyword": ["Server", "System", "Server management", "Server settings", "System information","version","php version","software","ip address","server ip address","server port","http host"],
+                "title": "Server",
+                "route_name": "admin.system.server.info",
+                "menu_active": "admin.system.server.info"
+            },
+            {
+                "keyword": ["Cache", "System", "Cache management", "Cache optimization", "System performance","clear cache"],
+                "title": "Cache",
+                "route_name": "admin.system.optimize",
+                "menu_active": "admin.system.optimize"
+            },
+            {
+                "keyword": ["Update", "System", "Update management", "System update", "Software updates","version update","upgrade","latest version"],
+                "title": "Update",
+                "route_name": "admin.system.update",
+                "menu_active": "admin.system.update*",
+                "counter":"updateAvailable"
+            }
+        ]
+    },
+    "report_and_request": {
+        "keyword": ["Report & Request", "Report and Request", "Reports and Requests", "Reporting and Requests", "Report management", "Request management","feature request","bug report"],
+        "title": "Report & Request",
+        "icon": "las la-bug",
+        "route_name": "admin.request.report",
+        "menu_active": "admin.request.report"
+    }
+}

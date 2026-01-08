@@ -1,0 +1,255 @@
+{
+    "banner": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Banner Section",
+        "content": {
+            "images": {
+                "banner_image": {
+                    "size": "510x510"
+                },
+                "students_image": {
+                    "size": "150x45"
+                },
+                "first_course_image": {
+                    "size": "40x40"
+                },
+                "second_course_image": {
+                    "size": "40x40"
+                }
+            },
+            "heading": "text",
+            "subheading": "text",
+            "button": "text",
+            "button_link": "text",
+            "subtitle": "text",
+            "first_course_title": "text",
+            "first_course_price": "text",
+            "first_course_lesson": "text",
+            "second_course_title": "text",
+            "second_course_price": "text",
+            "second_course_lesson": "text"
+
+        }
+    },
+
+    "sponsor": {
+        "builder": true,
+        "name": "Sponsor Section",
+        "content": {
+            "title": "text"
+        },
+        "element": {
+            "images": {
+                "sponsor_image": {
+                    "size": "150x50"
+                }
+            },
+            "modal": true
+        }
+    },
+    "choose_us": {
+        "builder": true,
+        "name": "Why Choose Us Section",
+        "content": {
+            "title": "text",
+            "subtitle": "text",
+            "description": "text"
+        },
+        "element": {
+            "title": "text",
+            "subtitle": "text",
+            "images": {
+                "image": {
+                    "size": "35x35"
+                }
+            },
+            "modal": true
+        }
+    },
+    "category": {
+        "builder": true,
+        "name": "Featured Category",
+        "content": {
+            "title": "text",
+            "subtitle": "text"
+        }
+    },
+    "course_info": {
+        "builder": true,
+        "name": "Course Info Section",
+        "content": {
+            "images": {
+                "video_thumb": {
+                    "size": "500x330"
+                }
+            },
+            "title": "text",
+            "subtitle": "text",
+            "video_link": "text"
+        },
+        "element": {
+            "title": "text",
+            "subtitle": "text",
+            "images": {
+                "image": {
+                    "size": "50x50"
+                }
+            },
+            "modal": true
+        }
+    },
+    "testimonial": {
+        "builder": true,
+        "name": "Testimonial Section",
+        "content": {
+            "title": "text"
+        },
+        "element": {
+            "images": {
+                "image": {
+                    "size": "50x50"
+                }
+            },
+            "name": "text",
+            "designation": "text",
+            "review": "textarea",
+            "rating": "text",
+            "modal": false
+        }
+    },
+    "subscribe": {
+        "builder": true,
+        "name": "Subscribe Section",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "640x450"
+                }
+            },
+            "title": "text",
+            "subtitle": "text"
+        }
+    },
+    "course_list": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Course List Page",
+        "content": {
+            "images": {
+                "background_image": {
+                    "size": "1920x310"
+                },
+                "icon_image": {
+                    "size": "50x50"
+                }
+            },
+            "title": "text",
+            "subtitle": "text"
+        }
+    },
+
+    "contact_us": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Contact Us",
+        "content": {
+            "images": {
+                "image": {
+                    "size": "460x390"
+                }
+            },
+            "header": "text",
+            "subheader": "text",
+            "title": "text",
+            "subtitle": "text",
+            "contact_details": "text",
+            "email_instruction": "text",
+            "email_address": "text",
+            "mobile_instruction": "text",
+            "contact_number": "text"
+        }
+    },
+
+    "login": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Login Section",
+        "content": {
+            "title": "text",
+            "subtitle": "text"
+        }
+    },
+    "register": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Register Section",
+        "content": {
+            "title": "text",
+            "subtitle": "text"
+        }
+    },
+
+    "social_login": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Social Login Section",
+        "content": {
+            "images": {
+                "google_image": {
+                    "size": "25x25"
+                },
+                "facebook_image": {
+                    "size": "25x25"
+                },
+                "linkedin_image": {
+                    "size": "25x25"
+                }
+            },
+            "google_text": "text",
+            "facebook_text": "text",
+            "linkedin_text": "text"
+        }
+    },
+
+    "social_icon": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Social Icons",
+        "element": {
+            "title": "text",
+            "social_icon": "icon",
+            "url": "text",
+            "modal": true
+        }
+    },
+
+    "policy_pages": {
+        "builder": true,
+        "no_selection": true,
+        "name": "Policy Pages",
+        "element": {
+            "title": "text",
+            "slug":"title",
+            "details": "textarea-nic",
+            "modal": false,
+            "seo":true
+        }
+    },
+    "register_disable": {
+        "builder": true,
+        "no_selection":true,
+        "name": "Registration Disable",
+        "content": {
+            "images":{
+                "image":{
+                    "size":"280x280"
+                }
+            },
+            "heading": "text",
+            "subheading":"text",
+            "button_name":"text",
+            "button_url":"text"
+        }
+    }
+}
