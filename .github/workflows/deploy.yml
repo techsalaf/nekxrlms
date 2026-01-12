@@ -49,19 +49,20 @@ jobs:
           php artisan view:clear
 
       - name: Deploy to Hostinger via SFTP
-        uses: SamKirkland/SFTP-Deploy-Action@v4.1.0
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.5
         with:
           server: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
-          server-dir: ${{ secrets.SFTP_REMOTE_PATH }}
+          local_path: ./
+          remote_path: ${{ secrets.SFTP_REMOTE_PATH }}
+          delete_remote_files: true
           exclude: |
             **/.git*
-            **/.git*/**
+            **/.github/**
             **/node_modules/**
             **/tests/**
             **/.env
-            **/.github/**
             **/storage/logs/**
 
