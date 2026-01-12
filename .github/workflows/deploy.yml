@@ -19,10 +19,26 @@ jobs:
           php-version: '8.3'
           tools: composer
 
+      - name: Create required directories
+        run: |
+          mkdir -p core/bootstrap/cache
+          mkdir -p core/storage/framework/cache
+          mkdir -p core/storage/framework/sessions
+          mkdir -p core/storage/framework/views
+          chmod -R 775 core/bootstrap/cache core/storage
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: core/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('core/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
       - name: Install Composer dependencies
         run: |
           cd core
-          composer install --no-dev --optimize-autoloader
+          composer install --no-dev --optimize-autoloader --no-interaction
 
       - name: Prepare Laravel for production
         run: |
