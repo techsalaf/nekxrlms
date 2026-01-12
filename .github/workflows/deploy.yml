@@ -48,14 +48,14 @@ jobs:
           php artisan route:clear
           php artisan view:clear
 
-      - name: Deploy to Hostinger via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Deploy to Hostinger via SFTP
+        uses: SamKirkland/SFTP-Deploy-Action@v4.1.0
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          server-dir: ${{ secrets.FTP_REMOTE_PATH }}
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          server-dir: ${{ secrets.SFTP_REMOTE_PATH }}
           exclude: |
             **/.git*
             **/.git*/**
