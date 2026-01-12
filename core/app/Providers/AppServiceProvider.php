@@ -76,7 +76,7 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
-        if (gs('force_ssl')) {
+        if (gs('force_ssl') && !in_array(request()->host(), ['localhost', '127.0.0.1'])) {
             \URL::forceScheme('https');
         }
 
