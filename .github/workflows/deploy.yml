@@ -57,7 +57,8 @@ jobs:
           port: ${{ secrets.FTP_PORT }}
           local_path: ./
           remote_path: ${{ secrets.FTP_REMOTE_PATH }}
-          delete_remote_files: true
+          sftp_only: true
+          delete_remote_files: false
           exclude: |
             **/.git*
             **/.github/**
@@ -65,4 +66,10 @@ jobs:
             **/tests/**
             **/.env
             **/storage/logs/**
+            **/vendor/**/tests/**
+            **/vendor/**/Tests/**
+            **/vendor/**/test/**
+            **/vendor/**/.git*
+            **/vendor/**/docs/**
+            **/vendor/**/examples/**
 
