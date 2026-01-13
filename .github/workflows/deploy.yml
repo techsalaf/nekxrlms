@@ -10,15 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Set up PHP
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer
 
+      # Step 3: Create required directories
       - name: Create required directories
         run: |
           mkdir -p core/bootstrap/cache
@@ -27,6 +30,7 @@ jobs:
           mkdir -p core/storage/framework/views
           chmod -R 775 core/bootstrap/cache core/storage
 
+      # Step 4: Cache Composer dependencies
       - name: Cache Composer dependencies
         uses: actions/cache@v3
         with:
@@ -35,21 +39,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-composer-
 
+      # Step 5: Install Composer dependencies
       - name: Install Composer dependencies
         run: |
           cd core
           composer install --no-dev --optimize-autoloader --no-interaction
 
+      # Step 6: Prepare Laravel for production
       - name: Prepare Laravel for production
         run: |
           cd core
-          php artisan key:generate --force || true
-          # Set production APP_URL from deployment
+          # Create .env if it doesn't exist
+          if [ ! -f .env ]; then
+            cp .env.example .env || echo "APP_URL=https://elearning.addawwamuun.com/v2" > .env
+          fi
+          # Update APP_URL to production
           sed -i 's|APP_URL=.*|APP_URL=https://elearning.addawwamuun.com/v2|g' .env
+          php artisan key:generate --force || true
           php artisan config:clear
           php artisan route:clear
           php artisan view:clear
 
+      # Step 7: Deploy to Hostinger via SFTP
       - name: Deploy to Hostinger via SFTP
         uses: wlixcc/SFTP-Deploy-Action@v1.2.5
         with:
