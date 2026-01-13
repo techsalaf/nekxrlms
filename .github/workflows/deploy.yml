@@ -51,14 +51,10 @@ jobs:
           cd core
           # Create .env if it doesn't exist
           if [ ! -f .env ]; then
-            cp .env.example .env || echo "APP_URL=https://elearning.addawwamuun.com/v2" > .env
+            cp .env.example .env
           fi
           # Update APP_URL to production
           sed -i 's|APP_URL=.*|APP_URL=https://elearning.addawwamuun.com/v2|g' .env
-          php artisan key:generate --force || true
-          php artisan config:clear
-          php artisan route:clear
-          php artisan view:clear
 
       # Step 7: Deploy to Hostinger via SFTP
       - name: Deploy to Hostinger via SFTP
@@ -85,4 +81,5 @@ jobs:
             **/vendor/**/.git*
             **/vendor/**/docs/**
             **/vendor/**/examples/**
+
 
