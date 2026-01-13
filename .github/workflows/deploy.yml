@@ -27,9 +27,9 @@ jobs:
           remote-port: ${{ secrets.FTP_PORT }}
           local-path: "./"
           remote-path: ${{ secrets.FTP_REMOTE_PATH }}
-          sync-delta: true
-          # Exclude directories we don't want to touch
-          ignore-rules: |
+          sync: "delta"
+          # Use the correct parameter name for exclusions
+          sync-delta-excludes: |
             .git/
             .github/
             node_modules/
