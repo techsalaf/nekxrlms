@@ -31,6 +31,8 @@ jobs:
             --exclude core/storage/logs/ \
              \
             --exclude core/tests/ \
+            --exclude core/vendor/ \
+            --exclude core/storage/framework/ \
             --exclude .env \
             --exclude core/.env;
           quit;
