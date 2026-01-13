@@ -27,9 +27,9 @@ jobs:
             --exclude .git/ \
             --exclude .github/ \
             --exclude node_modules/ \
-            --exclude core/vendor/ \
+             \
             --exclude core/storage/logs/ \
-            --exclude core/storage/framework/ \
+             \
             --exclude core/tests/ \
             --exclude .env \
             --exclude core/.env;
