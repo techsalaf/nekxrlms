@@ -41,10 +41,16 @@ composer.phar
 # Dotenv files (root and nested)
 .env
 .env.*
+!.env.example
+!core/.env.example
 *.env
 *.env.*
+!.env.example
+!core/.env.example
 /core/.env
 /core/.env.*
+!.env.example
+!core/.env.example
 
 # Common secret and key material
 *.pem
