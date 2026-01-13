@@ -13,73 +13,29 @@ jobs:
       # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
-
-      # Step 2: Set up PHP
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
-          tools: composer
+          fetch-depth: 0 # Important for incremental deployment
 
-      # Step 3: Create required directories
-      - name: Create required directories
-        run: |
-          mkdir -p core/bootstrap/cache
-          mkdir -p core/storage/framework/cache
-          mkdir -p core/storage/framework/sessions
-          mkdir -p core/storage/framework/views
-          chmod -R 775 core/bootstrap/cache core/storage
-
-      # Step 4: Cache Composer dependencies
-      - name: Cache Composer dependencies
-        uses: actions/cache@v3
-        with:
-          path: core/vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('core/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      # Step 5: Install Composer dependencies
-      - name: Install Composer dependencies
-        run: |
-          cd core
-          composer install --no-dev --optimize-autoloader --no-interaction
-
-      # Step 6: Prepare Laravel for production
-      - name: Prepare Laravel for production
-        run: |
-          cd core
-          # Create .env if it doesn't exist
-          if [ ! -f .env ]; then
-            cp .env.example .env
-          fi
-          # Update APP_URL to production
-          sed -i 's|APP_URL=.*|APP_URL=https://elearning.addawwamuun.com/v2|g' .env
-
-      # Step 7: Deploy to Hostinger via SFTP
-      - name: Deploy to Hostinger via SFTP
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.5
+      # Step 2: Deploy to Hostinger via SFTP
+      - name: 🚀 Deploy (Incremental)
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: ${{ secrets.FTP_PORT }}
-          local_path: ./
-          remote_path: ${{ secrets.FTP_REMOTE_PATH }}
-          sftp_only: true
-          delete_remote_files: false
+          protocol: sftp
+          local-dir: ./
+          server-dir: ${{ secrets.FTP_REMOTE_PATH }}
           exclude: |
             **/.git*
             **/.github/**
             **/node_modules/**
-            **/tests/**
-            **/.env
+            **/vendor/**
             **/storage/logs/**
-            **/vendor/**/tests/**
-            **/vendor/**/Tests/**
-            **/vendor/**/test/**
-            **/vendor/**/.git*
-            **/vendor/**/docs/**
-            **/vendor/**/examples/**
-
-
+            **/tests/**
+            core/storage/framework/cache/**
+            core/storage/framework/sessions/**
+            core/storage/framework/views/**
+            .env
+            core/.env
