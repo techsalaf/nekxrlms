@@ -4,7 +4,15 @@
     </IfModule>
 
     RewriteEngine On
+    # Dynamically detect the base path for subdirectories
+    RewriteCond %{REQUEST_URI} ^/v2/
+    RewriteBase /v2/
+    RewriteCond %{REQUEST_URI} !^/v2/
+    RewriteCond %{REQUEST_URI} ^/nekxrlms/
     RewriteBase /nekxrlms/
+    RewriteCond %{REQUEST_URI} !^/v2/
+    RewriteCond %{REQUEST_URI} !^/nekxrlms/
+    RewriteBase /
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .

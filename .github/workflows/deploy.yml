@@ -44,6 +44,8 @@ jobs:
         run: |
           cd core
           php artisan key:generate --force || true
+          # Set production APP_URL from deployment
+          sed -i 's|APP_URL=.*|APP_URL=https://elearning.addawwamuun.com/v2|g' .env
           php artisan config:clear
           php artisan route:clear
           php artisan view:clear
