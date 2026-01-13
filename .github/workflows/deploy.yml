@@ -10,32 +10,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
+      # Step 1: Checkout code with full history for delta detection
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Important for incremental deployment
+          fetch-depth: 0
 
-      # Step 2: Deploy to Hostinger via SFTP
+      # Step 2: Deploy to Hostinger via SFTP (Incremental)
       - name: 🚀 Deploy (Incremental)
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: milanmk/actions-file-deployer@master
         with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          protocol: sftp
-          local-dir: ./
-          server-dir: ${{ secrets.FTP_REMOTE_PATH }}
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/vendor/**
-            **/storage/logs/**
-            **/tests/**
-            core/storage/framework/cache/**
-            core/storage/framework/sessions/**
-            core/storage/framework/views/**
+          remote-protocol: "sftp"
+          remote-host: ${{ secrets.FTP_HOST }}
+          remote-user: ${{ secrets.FTP_USERNAME }}
+          remote-password: ${{ secrets.FTP_PASSWORD }}
+          remote-port: ${{ secrets.FTP_PORT }}
+          local-path: "./"
+          remote-path: ${{ secrets.FTP_REMOTE_PATH }}
+          sync-delta: true
+          # Exclude directories we don't want to touch
+          ignore-rules: |
+            .git/
+            .github/
+            node_modules/
+            core/vendor/
+            core/storage/logs/
+            core/tests/
+            core/storage/framework/cache/
+            core/storage/framework/sessions/
+            core/storage/framework/views/
             .env
             core/.env
