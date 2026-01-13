@@ -10,28 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Deploy to Hostinger via SFTP
-      - name: 🚀 Deploy to Hostinger
-        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: ${{ secrets.FTP_PORT }}
-          local_path: ./
-          remote_path: ${{ secrets.FTP_REMOTE_PATH }}
-          sftp_only: true
-          delete_remote_files: false
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/node_modules/**
-            **/vendor/**
-            **/storage/logs/**
-            **/storage/framework/**
-            **/.env
-            **/tests/**
+      - name: 🚀 Deploy via LFTP (Fast & Incremental)
+        run: |
+          sudo apt-get update && sudo apt-get install -y lftp
+          lftp -c "
+          set sftp:auto-confirm yes;
+          set sftp:connect-program 'ssh -a -x -o StrictHostKeyChecking=no';
+          open -u ${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }} -p ${{ secrets.FTP_PORT }} sftp://${{ secrets.FTP_HOST }};
+          mirror -R ./ ${{ secrets.FTP_REMOTE_PATH }} \
+            --ignore-time \
+            --parallel=10 \
+            --exclude .git/ \
+            --exclude .github/ \
+            --exclude node_modules/ \
+            --exclude core/vendor/ \
+            --exclude core/storage/logs/ \
+            --exclude core/storage/framework/ \
+            --exclude core/tests/ \
+            --exclude .env \
+            --exclude core/.env;
+          quit;
+          "
