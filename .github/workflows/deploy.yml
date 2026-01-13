@@ -28,16 +28,5 @@ jobs:
           local-path: "./"
           remote-path: ${{ secrets.FTP_REMOTE_PATH }}
           sync: "delta"
-          # Use the correct parameter name for exclusions
-          sync-delta-excludes: |
-            .git/
-            .github/
-            node_modules/
-            core/vendor/
-            core/storage/logs/
-            core/tests/
-            core/storage/framework/cache/
-            core/storage/framework/sessions/
-            core/storage/framework/views/
-            .env
-            core/.env
+          # Space-separated list of files and directories to exclude
+          sync-delta-excludes: ".git .github node_modules core/vendor core/storage/logs core/tests core/storage/framework/cache core/storage/framework/sessions core/storage/framework/views .env core/.env"
