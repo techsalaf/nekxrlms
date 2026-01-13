@@ -10,23 +10,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout code with full history for delta detection
+      # Step 1: Checkout code
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # Step 2: Deploy to Hostinger via SFTP (Incremental)
-      - name: 🚀 Deploy (Incremental)
-        uses: milanmk/actions-file-deployer@master
+      # Step 2: Deploy to Hostinger via SFTP
+      - name: 🚀 Deploy to Hostinger
+        uses: wlixcc/SFTP-Deploy-Action@v1.2.4
         with:
-          remote-protocol: "sftp"
-          remote-host: ${{ secrets.FTP_HOST }}
-          remote-user: ${{ secrets.FTP_USERNAME }}
-          remote-password: ${{ secrets.FTP_PASSWORD }}
-          remote-port: ${{ secrets.FTP_PORT }}
-          local-path: "./"
-          remote-path: ${{ secrets.FTP_REMOTE_PATH }}
-          sync: "delta"
-          # Space-separated list of files and directories to exclude
-          sync-delta-excludes: ".git .github node_modules core/vendor core/storage/logs core/tests core/storage/framework/cache core/storage/framework/sessions core/storage/framework/views .env core/.env"
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          port: ${{ secrets.FTP_PORT }}
+          local_path: ./
+          remote_path: ${{ secrets.FTP_REMOTE_PATH }}
+          sftp_only: true
+          delete_remote_files: false
+          exclude: |
+            **/.git*
+            **/.github/**
+            **/node_modules/**
+            **/vendor/**
+            **/storage/logs/**
+            **/storage/framework/**
+            **/.env
+            **/tests/**
