@@ -148,7 +148,14 @@
                         uploadVideo(file, videoDuration);
                     };
                 } else {
-                    videoDuration = $('[name=duration]').val();
+                    // For Youtube (2) and Loom (3), read duration from the visible group's input
+                    if (videoServer == 2) {
+                        videoDuration = $('.youtubeGroup input[name="duration"]').val();
+                    } else if (videoServer == 3) {
+                        videoDuration = $('.loomGroup input[name="duration"]').val();
+                    } else {
+                        videoDuration = $('[name=duration]').val();
+                    }
                     let parts = videoDuration.split(':');
 
                     if (parts.length !== 3) {

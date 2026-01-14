@@ -38,13 +38,23 @@
                                             </td>
                                         @endif
                                         <td>
-                                            @if ($lesson->server)
-                                                @lang('FTP')
-                                            @elseif($lesson->path)
-                                                @lang('Current')
-                                            @else
-                                                --
-                                            @endif /
+                                            @php
+                                                // Map video server code to human-readable labels
+                                                $videoServerLabel = '--';
+                                                if ($lesson->server === 0) {
+                                                    $videoServerLabel = __('Current');
+                                                } elseif ($lesson->server === 1) {
+                                                    $videoServerLabel = __('FTP');
+                                                } elseif ($lesson->server === 2) {
+                                                    $videoServerLabel = __('Youtube Link');
+                                                } elseif ($lesson->server === 3) {
+                                                    $videoServerLabel = __('Loom Link');
+                                                } elseif ($lesson->path) {
+                                                    // Fallback: if path exists but server not set
+                                                    $videoServerLabel = __('Current');
+                                                }
+                                            @endphp
+                                            {{ $videoServerLabel }} /
                                             @if ($lesson->asset_server)
                                                 @lang('FTP')
                                             @elseif($lesson->asset_path)
