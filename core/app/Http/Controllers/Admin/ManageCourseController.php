@@ -277,7 +277,7 @@ class ManageCourseController extends Controller
     public function uploadLessonVideo(Request $request, $id)
     {
         $rules = [
-            'file_server'    => 'required|in:0,1,2',
+            'file_server'    => 'required|in:0,1,2,3',
             'video_duration' => 'required|numeric',
         ];
 
@@ -285,6 +285,8 @@ class ManageCourseController extends Controller
             $rules['file'] = ['required', new FileTypeValidate(['mp4'])];
         } elseif ($request->file_server == 2) {
             $rules['youtube_link'] = ['required', 'url'];
+        } elseif ($request->file_server == 3) {
+            $rules['loom_link'] = ['required', 'url'];
         } else {
             $rules['start']          = 'required';
             $rules['file_server']    = 'required';
@@ -361,8 +363,10 @@ class ManageCourseController extends Controller
         if ($request->file_server == 1) {
             $path         = '//lesson_videos/' . date('Y') . '/' . date('m') . '/' . date('d') . '/';
             $lesson->path = $this->uploadToFtp($request->file, $path);
-        } else {
+        } elseif ($request->file_server == 2) {
             $lesson->path = $request->youtube_link;
+        } elseif ($request->file_server == 3) {
+            $lesson->path = $request->loom_link;
         }
 
         $lesson->server         = $request->file_server;

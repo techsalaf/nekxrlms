@@ -31,6 +31,7 @@
                                             <option value="0" @selected($lesson->server == 0)>@lang('Current Server')</option>
                                             <option value="1" @selected($lesson->server == 1)>@lang('FTP Server')</option>
                                             <option value="2" @selected($lesson->server == 2)>@lang('Youtube Link')</option>
+                                            <option value="3" @selected($lesson->server == 3)>@lang('Loom Link')</option>
                                         </select>
                                     </div>
 
@@ -54,6 +55,18 @@
                                             class="form-control">
                                     </div>
                                     <div class="form-group youtubeGroup">
+                                        <label>@lang('Duration') @lang('HH:MM:SS')</label>
+                                        <input type="text" name="duration"
+                                            value="{{ now()->startOfDay()->addSeconds($lesson->video_duration)->format('H:i:s') }}"
+                                            placeholder="@lang('02:17:45')" class="form-control">
+                                    </div>
+                                    <div class="form-group loomGroup" style="display:none;">
+                                        <label>@lang('Loom Video Link')</label>
+                                        <input type="text" name="loom_link"
+                                            @if ($lesson->server == 3) value="{{ $lesson->path }}" @endif
+                                            class="form-control" placeholder="@lang('e.g., https://www.loom.com/share/...')">
+                                    </div>
+                                    <div class="form-group loomGroup" style="display:none;">
                                         <label>@lang('Duration') @lang('HH:MM:SS')</label>
                                         <input type="text" name="duration"
                                             value="{{ now()->startOfDay()->addSeconds($lesson->video_duration)->format('H:i:s') }}"
@@ -89,14 +102,22 @@
                     $('.videoFileGroup').show();
                     $('.progressGroup').show();
                     $('.youtubeGroup').hide();
+                    $('.loomGroup').hide();
                 } else if (videoServer == 1) {
                     $('.videoFileGroup').show();
                     $('.progressGroup').hide();
                     $('.youtubeGroup').hide();
-                } else {
+                    $('.loomGroup').hide();
+                } else if (videoServer == 2) {
                     $('.videoFileGroup').hide();
                     $('.progressGroup').hide();
                     $('.youtubeGroup').show();
+                    $('.loomGroup').hide();
+                } else if (videoServer == 3) {
+                    $('.videoFileGroup').hide();
+                    $('.progressGroup').hide();
+                    $('.youtubeGroup').hide();
+                    $('.loomGroup').show();
                 }
 
             }).change();
@@ -112,12 +133,12 @@
                     file = fileInput.files[0];
                 }
 
-                if (!file && videoServer != 2) {
+                if (!file && videoServer != 2 && videoServer != 3) {
                     notify('error', 'Please select a file');
                     return false;
                 }
 
-                if (videoServer != 2) {
+                if (videoServer != 2 && videoServer != 3) {
                     let video = document.createElement('video');
                     video.preload = 'metadata';
                     video.src = URL.createObjectURL(file);
@@ -165,12 +186,14 @@
                     if (videoServer == 1) {
                         $('#uploadBtn').text(`@lang('Uploading.....')`).attr('disabled', true);
                     }
-                    let youtubeLink = $('[name=youtube_link]').val();
+                    let youtubeLink = videoServer == 2 ? $('[name=youtube_link]').val() : '';
+                    let loomLink = videoServer == 3 ? $('[name=loom_link]').val() : '';
                     let formData = new FormData();
 
                     formData.append('_token', '{{ csrf_token() }}');
                     formData.append('file', file);
                     formData.append('youtube_link', youtubeLink);
+                    formData.append('loom_link', loomLink);
                     formData.append('file_server', videoServer);
                     formData.append('video_duration', videoDuration);
 
@@ -202,3 +225,4 @@
 @push('breadcrumb-plugins')
     <x-back route="{{ route('admin.course.section.lessons', $lesson->section->id) }}" />
 @endpush
+
