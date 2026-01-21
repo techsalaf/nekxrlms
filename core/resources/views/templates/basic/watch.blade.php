@@ -7,7 +7,7 @@
                 <div class="row gy-4 gy-lg-0 gx-lg-4">
                     <div class="col-lg-8">
                         <div class="course-view-inner course-view-inner-left">
-                            @if ($currentLesson->server == 2)
+                            @if ($currentLesson->server == 2 || $currentLesson->server == 3)
                                 <iframe width="100%" height="500px" src="{{ convertToEmbedUrl($currentLesson->path) }}"
                                     frameborder="0" allowfullscreen></iframe>
                             @else

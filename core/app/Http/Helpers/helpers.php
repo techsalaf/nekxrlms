@@ -605,26 +605,74 @@ function gatewayRedirectUrl($type = false)
     }
 }
 
-function convertToEmbedUrl($youtubeUrl)
+function convertToEmbedUrl($url)
 {
-    $videoId = '';
-
-    parse_str(parse_url($youtubeUrl, PHP_URL_QUERY), $queryParams);
-    if (isset($queryParams['v'])) {
-        $videoId = $queryParams['v'];
+    if (!$url) {
+        return null;
     }
 
-    if (empty($videoId)) {
-        $path      = parse_url($youtubeUrl, PHP_URL_PATH);
-        $pathParts = explode('/', $path);
-        if (!empty($pathParts[1])) {
-            $videoId = $pathParts[1];
+    $host = parse_url($url, PHP_URL_HOST);
+    $path = parse_url($url, PHP_URL_PATH) ?? '';
+    $query = [];
+    parse_str(parse_url($url, PHP_URL_QUERY) ?? '', $query);
+
+    // Normalize host (strip www.)
+    $host = preg_replace('/^www\./', '', strtolower($host));
+    $segments = array_values(array_filter(explode('/', $path))); // remove empty parts
+
+    // Handle YouTube and youtu.be (supports shorts, watch, embed, youtu.be)
+    if (strpos($host, 'youtube.com') !== false || strpos($host, 'youtu.be') !== false || strpos($host, 'm.youtube.com') !== false) {
+        $videoId = '';
+
+        // watch?v=ID
+        if (!empty($query['v'])) {
+            $videoId = $query['v'];
+        }
+
+        // youtu.be/ID or /embed/ID or /shorts/ID
+        if (!$videoId && !empty($segments)) {
+            // shorts link: /shorts/ID
+            if (isset($segments[0]) && $segments[0] === 'shorts' && isset($segments[1])) {
+                $videoId = $segments[1];
+            }
+            // embed link: /embed/ID
+            elseif (isset($segments[0]) && $segments[0] === 'embed' && isset($segments[1])) {
+                $videoId = $segments[1];
+            }
+            // youtu.be/ID or youtube.com/ID
+            else {
+                $videoId = end($segments);
+            }
+        }
+
+        if ($videoId) {
+            // Add sane defaults to reduce external distractions
+            $params = http_build_query([
+                'rel' => 0,
+                'modestbranding' => 1,
+                'playsinline' => 1,
+                'iv_load_policy' => 3,
+                'enablejsapi' => 1,
+            ]);
+            return "https://www.youtube.com/embed/{$videoId}?{$params}";
         }
     }
 
-    if (!empty($videoId)) {
-        return "https://www.youtube.com/embed/$videoId";
+    // Handle Loom: share/ID -> embed/ID
+    if (strpos($host, 'loom.com') !== false) {
+        $id = '';
+        if (!empty($segments)) {
+            // share/ID or embed/ID
+            if (isset($segments[0]) && in_array($segments[0], ['share', 'embed']) && isset($segments[1])) {
+                $id = $segments[1];
+            } else {
+                $id = end($segments);
+            }
+        }
+        if ($id) {
+            return "https://www.loom.com/embed/{$id}";
+        }
     }
 
-    return null;
+    return $url; // fallback to given URL
 }

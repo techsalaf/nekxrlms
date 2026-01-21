@@ -11,7 +11,7 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-lg-6">
-                                @if ($lesson->server == 2)
+                                @if ($lesson->server == 2 || $lesson->server == 3)
                                     <iframe width="100%" height="400px" src="{{ convertToEmbedUrl($lesson->path) }}"
                                         frameborder="0" allowfullscreen></iframe>
                                 @else
