@@ -37,3 +37,18 @@ jobs:
             --exclude core/.env;
           quit;
           "
+
+      - name: 🧩 Run migrations + optimize via deploy hook
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+          DEPLOY_HOOK_TOKEN: ${{ secrets.DEPLOY_HOOK_TOKEN }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_URL" ] || [ -z "$DEPLOY_HOOK_TOKEN" ]; then
+            echo "Deploy hook secrets are missing. Please set DEPLOY_HOOK_URL and DEPLOY_HOOK_TOKEN."
+            exit 1
+          fi
+
+          echo "Calling deploy hook..."
+          curl -fsS --retry 3 --retry-delay 5 \
+            -H "X-DEPLOY-TOKEN: $DEPLOY_HOOK_TOKEN" \
+            "$DEPLOY_HOOK_URL"

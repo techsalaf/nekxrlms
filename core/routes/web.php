@@ -1,10 +1,37 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/clear', function () {
     \Illuminate\Support\Facades\Artisan::call('optimize:clear');
 });
+
+Route::get('/deploy/run-migrations', function () {
+    $token = request()->header('X-DEPLOY-TOKEN');
+    $expectedToken = env('DEPLOY_HOOK_TOKEN');
+
+    if (!$expectedToken || !$token || !hash_equals($expectedToken, $token)) {
+        abort(403);
+    }
+
+    Artisan::call('migrate', ['--force' => true]);
+    $migrateOutput = trim(Artisan::output());
+
+    Artisan::call('optimize:clear');
+    $clearOutput = trim(Artisan::output());
+
+    Artisan::call('optimize');
+    $optimizeOutput = trim(Artisan::output());
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Deployment hook executed',
+        'migrate' => $migrateOutput,
+        'optimize_clear' => $clearOutput,
+        'optimize' => $optimizeOutput,
+    ]);
+})->name('deploy.run.migrations');
 
 // User Support Ticket
 Route::controller('TicketController')->prefix('ticket')->name('ticket.')->group(function () {
