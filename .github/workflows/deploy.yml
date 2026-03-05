@@ -61,12 +61,6 @@ jobs:
             exit 1
           fi
 
-          BASE_URL="${DEPLOY_HOOK_URL%/deploy/run-migrations}"
-
-          # Ensure fresh routes/config before calling the new hook route
-          echo "Clearing app cache via /clear endpoint..."
-          curl -fsS --retry 2 --retry-delay 3 "$BASE_URL/clear" || true
-
           echo "Calling deploy hook..."
           RESPONSE=$(curl -sS --retry 3 --retry-delay 5 \
             -H "X-DEPLOY-TOKEN: $DEPLOY_HOOK_TOKEN" \

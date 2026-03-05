@@ -22,14 +22,34 @@ Route::get('/deploy/run-migrations', function () {
         abort(403);
     }
 
-    Artisan::call('migrate', ['--force' => true]);
-    $migrateOutput = trim(Artisan::output());
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        $migrateOutput = trim(Artisan::output());
+    } catch (\Throwable $e) {
+        return response()->json([
+            'status' => 'error',
+            'stage' => 'migrate',
+            'message' => $e->getMessage(),
+        ], 500);
+    }
 
-    Artisan::call('optimize:clear');
-    $clearOutput = trim(Artisan::output());
+    $warnings = [];
+    $clearOutput = '';
+    $optimizeOutput = '';
 
-    Artisan::call('optimize');
-    $optimizeOutput = trim(Artisan::output());
+    try {
+        Artisan::call('optimize:clear');
+        $clearOutput = trim(Artisan::output());
+    } catch (\Throwable $e) {
+        $warnings[] = 'optimize:clear failed: ' . $e->getMessage();
+    }
+
+    try {
+        Artisan::call('optimize');
+        $optimizeOutput = trim(Artisan::output());
+    } catch (\Throwable $e) {
+        $warnings[] = 'optimize failed: ' . $e->getMessage();
+    }
 
     return response()->json([
         'status' => 'success',
@@ -37,6 +57,7 @@ Route::get('/deploy/run-migrations', function () {
         'migrate' => $migrateOutput,
         'optimize_clear' => $clearOutput,
         'optimize' => $optimizeOutput,
+        'warnings' => $warnings,
     ]);
 })->name('deploy.run.migrations');
 
