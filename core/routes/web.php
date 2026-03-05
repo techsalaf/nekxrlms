@@ -25,45 +25,72 @@ Route::get('/deploy/run-migrations', function () {
     $baselineApplied = [];
     $installOutput = '';
 
-    try {
+    $baselineMigrations = [
+        '0001_01_01_000000_create_users_table' => 'users',
+        '0001_01_01_000001_create_cache_table' => 'cache',
+        '0001_01_01_000002_create_jobs_table' => 'jobs',
+    ];
+
+    $ensureBaseline = function () use (&$baselineApplied, &$installOutput, $baselineMigrations) {
         if (!\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
             Artisan::call('migrate:install');
             $installOutput = trim(Artisan::output());
         }
 
-        if (\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
-            $baselineMigrations = [
-                '0001_01_01_000000_create_users_table' => 'users',
-                '0001_01_01_000001_create_cache_table' => 'cache',
-                '0001_01_01_000002_create_jobs_table' => 'jobs',
-            ];
+        if (!\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
+            return;
+        }
 
-            $batch = (int) (\Illuminate\Support\Facades\DB::table('migrations')->max('batch') ?: 1);
+        $batch = (int) (\Illuminate\Support\Facades\DB::table('migrations')->max('batch') ?: 1);
 
-            foreach ($baselineMigrations as $migration => $table) {
-                if (!\Illuminate\Support\Facades\Schema::hasTable($table)) {
-                    continue;
-                }
+        foreach ($baselineMigrations as $migration => $table) {
+            if (!\Illuminate\Support\Facades\Schema::hasTable($table)) {
+                continue;
+            }
 
-                $exists = \Illuminate\Support\Facades\DB::table('migrations')->where('migration', $migration)->exists();
-                if (!$exists) {
-                    \Illuminate\Support\Facades\DB::table('migrations')->insert([
-                        'migration' => $migration,
-                        'batch'     => $batch,
-                    ]);
-                    $baselineApplied[] = $migration;
-                }
+            $exists = \Illuminate\Support\Facades\DB::table('migrations')->where('migration', $migration)->exists();
+            if (!$exists) {
+                \Illuminate\Support\Facades\DB::table('migrations')->insert([
+                    'migration' => $migration,
+                    'batch'     => $batch,
+                ]);
+                $baselineApplied[] = $migration;
             }
         }
+    };
+
+    try {
+        $ensureBaseline();
 
         Artisan::call('migrate', ['--force' => true]);
         $migrateOutput = trim(Artisan::output());
     } catch (\Throwable $e) {
-        return response()->json([
-            'status' => 'error',
-            'stage' => 'migrate',
-            'message' => $e->getMessage(),
-        ], 500);
+        $firstError = $e->getMessage();
+
+        if (str_contains(strtolower($firstError), 'already exists')) {
+            try {
+                $ensureBaseline();
+                Artisan::call('migrate', ['--force' => true]);
+                $migrateOutput = trim(Artisan::output());
+            } catch (\Throwable $retryEx) {
+                return response()->json([
+                    'status' => 'error',
+                    'stage' => 'migrate_retry',
+                    'message' => $retryEx->getMessage(),
+                    'first_error' => $firstError,
+                    'migrate_install' => $installOutput,
+                    'baseline_applied' => $baselineApplied,
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'stage' => 'migrate',
+                'message' => $firstError,
+                'migrate_install' => $installOutput,
+                'baseline_applied' => $baselineApplied,
+            ], 500);
+        }
     }
 
     $warnings = [];
