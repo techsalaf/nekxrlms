@@ -8,8 +8,6 @@ Route::get('/clear', function () {
 });
 
 Route::get('/deploy/run-migrations', function () {
-    @set_time_limit(0);
-
     $token = request()->header('X-DEPLOY-TOKEN');
     $expectedToken = env('DEPLOY_HOOK_TOKEN');
 
@@ -24,97 +22,78 @@ Route::get('/deploy/run-migrations', function () {
         abort(403);
     }
 
-    $installOutput = '';
-    $warnings = [];
-    $baselineApplied = [];
-    $targetedMigrationOutput = [];
-
-    $requiredMigrations = [
-        [
-            'name'  => '2026_03_05_000001_create_course_access_controls_table',
-            'table' => 'course_access_controls',
-            'path'  => 'database/migrations/2026_03_05_000001_create_course_access_controls_table.php',
-        ],
-        [
-            'name'  => '2026_03_05_000002_create_lesson_completions_table',
-            'table' => 'lesson_completions',
-            'path'  => 'database/migrations/2026_03_05_000002_create_lesson_completions_table.php',
-        ],
-    ];
-
     try {
+        $createdTables = [];
+        $baselineApplied = [];
+
         if (!\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
-            Artisan::call('migrate:install');
-            $installOutput = trim(Artisan::output());
+            \Illuminate\Support\Facades\Schema::create('migrations', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->string('migration');
+                $table->integer('batch');
+            });
         }
 
         $batch = (int) (\Illuminate\Support\Facades\DB::table('migrations')->max('batch') ?: 1);
 
-        foreach ($requiredMigrations as $migration) {
-            $alreadyRecorded = \Illuminate\Support\Facades\DB::table('migrations')
-                ->where('migration', $migration['name'])
+        if (!\Illuminate\Support\Facades\Schema::hasTable('course_access_controls')) {
+            \Illuminate\Support\Facades\Schema::create('course_access_controls', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id')->index();
+                $table->unsignedBigInteger('course_id')->index();
+                $table->boolean('is_locked')->default(false);
+                $table->unsignedBigInteger('updated_by')->nullable();
+                $table->timestamps();
+                $table->unique(['user_id', 'course_id']);
+            });
+            $createdTables[] = 'course_access_controls';
+        }
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('lesson_completions')) {
+            \Illuminate\Support\Facades\Schema::create('lesson_completions', function (\Illuminate\Database\Schema\Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('user_id')->index();
+                $table->unsignedBigInteger('course_id')->index();
+                $table->unsignedBigInteger('lesson_id')->index();
+                $table->timestamp('completed_at')->nullable();
+                $table->timestamps();
+                $table->unique(['user_id', 'lesson_id']);
+            });
+            $createdTables[] = 'lesson_completions';
+        }
+
+        $migrationNames = [
+            '2026_03_05_000001_create_course_access_controls_table',
+            '2026_03_05_000002_create_lesson_completions_table',
+        ];
+
+        foreach ($migrationNames as $migrationName) {
+            $exists = \Illuminate\Support\Facades\DB::table('migrations')
+                ->where('migration', $migrationName)
                 ->exists();
 
-            if ($alreadyRecorded) {
-                $targetedMigrationOutput[$migration['name']] = 'Already recorded';
-                continue;
-            }
-
-            if (\Illuminate\Support\Facades\Schema::hasTable($migration['table'])) {
+            if (!$exists) {
                 \Illuminate\Support\Facades\DB::table('migrations')->insert([
-                    'migration' => $migration['name'],
+                    'migration' => $migrationName,
                     'batch'     => $batch,
                 ]);
-                $baselineApplied[] = $migration['name'];
-                $targetedMigrationOutput[$migration['name']] = 'Table exists; migration baseline inserted';
-                continue;
+                $baselineApplied[] = $migrationName;
             }
-
-            Artisan::call('migrate', [
-                '--force' => true,
-                '--path'  => $migration['path'],
-            ]);
-            $targetedMigrationOutput[$migration['name']] = trim(Artisan::output());
         }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Deployment schema sync completed',
+            'created_tables' => $createdTables,
+            'baseline_applied' => $baselineApplied,
+        ]);
     } catch (\Throwable $e) {
         return response()->json([
             'status' => 'error',
-            'stage' => 'targeted_migrate',
+            'stage' => 'schema_sync',
             'message' => $e->getMessage(),
-            'migrate_install' => $installOutput,
-            'baseline_applied' => $baselineApplied,
-            'targeted_migrations' => $targetedMigrationOutput,
         ], 500);
     }
-
-    $clearOutput = '';
-    $optimizeOutput = '';
-
-    try {
-        Artisan::call('optimize:clear');
-        $clearOutput = trim(Artisan::output());
-    } catch (\Throwable $e) {
-        $warnings[] = 'optimize:clear failed: ' . $e->getMessage();
-    }
-
-    try {
-        Artisan::call('optimize');
-        $optimizeOutput = trim(Artisan::output());
-    } catch (\Throwable $e) {
-        $warnings[] = 'optimize failed: ' . $e->getMessage();
-    }
-
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Deployment hook executed',
-        'migrate_install' => $installOutput,
-        'baseline_applied' => $baselineApplied,
-        'migrate' => 'Targeted migration strategy completed',
-        'targeted_migrations' => $targetedMigrationOutput,
-        'optimize_clear' => $clearOutput,
-        'optimize' => $optimizeOutput,
-        'warnings' => $warnings,
-    ]);
 })->name('deploy.run.migrations');
 
 // User Support Ticket
