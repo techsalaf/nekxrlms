@@ -11,6 +11,7 @@ use App\Models\Frontend;
 use App\Models\GatewayCurrency;
 use App\Models\Language;
 use App\Models\Lesson;
+use App\Models\LessonCompletion;
 use App\Models\Page;
 use App\Models\Review;
 use App\Models\Subscriber;
@@ -19,6 +20,7 @@ use App\Models\SupportTicket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class SiteController extends Controller
@@ -172,16 +174,54 @@ class SiteController extends Controller
             $course->active();
         })->with('course')->findOrFail($id);
 
-        if (!lessonPermission($currentLesson)) {
+        if (!coursePermissionById($currentLesson->course_id, (bool) $currentLesson->premium, auth()->id())) {
             $notify[] = ['error', 'Please purchase the course for watch the video!'];
             return back()->withNotify($notify);
         }
 
+        if (!lessonDripUnlocked($currentLesson, auth()->id())) {
+            $notify[] = ['error', 'Please complete previous lesson(s) to unlock this lesson.'];
+            return back()->withNotify($notify);
+        }
+
         $course = $currentLesson->course()->with(['sections' => function ($section) {
-            $section->active();
+            $section->active()->orderBy('id');
         }, 'sections.lessons' => function ($lesson) {
-            $lesson->active();
+            $lesson->active()->orderBy('id');
         }])->first();
+
+        $orderedLessons = collect();
+        foreach ($course->sections as $section) {
+            foreach ($section->lessons as $sectionLesson) {
+                $orderedLessons->push($sectionLesson);
+            }
+        }
+
+        $completedLessonIds = collect();
+        if (auth()->check() && Schema::hasTable('lesson_completions')) {
+            $completedLessonIds = LessonCompletion::where('user_id', auth()->id())
+                ->where('course_id', $course->id)
+                ->pluck('lesson_id');
+        }
+
+        $completedLessonIdsArray = $completedLessonIds->toArray();
+        $allPreviousCompleted = true;
+        $lessonStates = [];
+
+        foreach ($orderedLessons as $orderedLesson) {
+            $baseAllowed = coursePermissionById($orderedLesson->course_id, (bool) $orderedLesson->premium, auth()->id());
+            $dripUnlocked = !auth()->check() ? true : $allPreviousCompleted;
+            $isCompleted = in_array($orderedLesson->id, $completedLessonIdsArray);
+
+            $lessonStates[$orderedLesson->id] = [
+                'is_locked'    => !$baseAllowed || !$dripUnlocked,
+                'is_completed' => $isCompleted,
+            ];
+
+            if (auth()->check()) {
+                $allPreviousCompleted = $allPreviousCompleted && $isCompleted;
+            }
+        }
 
         $userReview = '';
         if (auth()->check()) {
@@ -190,7 +230,66 @@ class SiteController extends Controller
 
         $currentLesson->increment('views');
 
-        return view(activeTemplate() . 'watch', compact('pageTitle', 'currentLesson', 'course', 'userReview'));
+        return view(activeTemplate() . 'watch', compact('pageTitle', 'currentLesson', 'course', 'userReview', 'lessonStates', 'completedLessonIdsArray'));
+    }
+
+    public function completeLesson($id)
+    {
+        if (!auth()->check()) {
+            return response()->json(['status' => 'error', 'message' => 'Unauthorized'], 401);
+        }
+
+        if (!Schema::hasTable('lesson_completions')) {
+            return response()->json(['status' => 'error', 'message' => 'Lesson completion table is missing. Please run migration first.'], 422);
+        }
+
+        $lesson = Lesson::active()->findOrFail($id);
+
+        if (!coursePermissionById($lesson->course_id, (bool) $lesson->premium, auth()->id())) {
+            return response()->json(['status' => 'error', 'message' => 'You are not allowed to access this lesson.'], 403);
+        }
+
+        if (!lessonDripUnlocked($lesson, auth()->id())) {
+            return response()->json(['status' => 'error', 'message' => 'Please complete previous lesson(s) first.'], 403);
+        }
+
+        LessonCompletion::updateOrCreate(
+            [
+                'user_id'   => auth()->id(),
+                'course_id' => $lesson->course_id,
+                'lesson_id' => $lesson->id,
+            ],
+            [
+                'completed_at' => now(),
+            ]
+        );
+
+        $orderedLessonIds = Lesson::where('course_id', $lesson->course_id)
+            ->where('status', Status::ENABLE)
+            ->orderBy('section_id')
+            ->orderBy('id')
+            ->pluck('id')
+            ->values();
+
+        $currentIndex = $orderedLessonIds->search($lesson->id);
+        $nextLesson = null;
+        if ($currentIndex !== false) {
+            $nextLessonId = $orderedLessonIds->get($currentIndex + 1);
+            if ($nextLessonId) {
+                $nextLesson = Lesson::find($nextLessonId);
+            }
+        }
+
+        $nextLessonUrl = null;
+        if ($nextLesson && lessonDripUnlocked($nextLesson, auth()->id())) {
+            $nextLessonUrl = route('course.lesson', [slug($nextLesson->title), $nextLesson->id]);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Lesson marked as completed',
+            'next_lesson_url' => $nextLessonUrl,
+        ]);
     }
 
     public function downloadLessonAsset($id)

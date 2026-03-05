@@ -3,6 +3,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\CourseAccessControl;
 use App\Models\CoursePurchase;
 use App\Models\Deposit;
 use App\Models\NotificationLog;
@@ -93,12 +95,61 @@ class ManageUsersController extends Controller
         $pageTitle = 'User Detail - '.$user->username;
 
         $purchasedCourses = CoursePurchase::where('user_id', $user->id)->count();
+        $purchasedCourseIds = CoursePurchase::where('user_id', $user->id)->pluck('course_id')->toArray();
+        $accessOverrides = collect();
+        if (\Illuminate\Support\Facades\Schema::hasTable('course_access_controls')) {
+            $accessOverrides = CourseAccessControl::where('user_id', $user->id)->get()->keyBy('course_id');
+        }
+        $courses = Course::active()->select('id', 'title', 'premium')->orderBy('title')->get();
+
         $totalDeposit     = Deposit::where('user_id',$user->id)->successful()->sum('amount');
         $totalReviews     = Review::where('user_id', $user->id)->count();
         $supportTickets   = SupportTicket::where('user_id', $user->id)->count();
 
         $countries = json_decode(file_get_contents(resource_path('views/partials/country.json')));
-        return view('admin.users.detail', compact('pageTitle', 'user','totalDeposit','countries','purchasedCourses','totalReviews','supportTickets'));
+        return view('admin.users.detail', compact('pageTitle', 'user','totalDeposit','countries','purchasedCourses','totalReviews','supportTickets','courses','accessOverrides','purchasedCourseIds'));
+    }
+
+    public function updateCourseAccess(Request $request, $id)
+    {
+        $request->validate([
+            'course_id' => 'required|integer|exists:courses,id',
+            'action'    => 'required|in:lock,unlock,reset',
+        ]);
+
+        $user = User::findOrFail($id);
+        $course = Course::findOrFail($request->course_id);
+
+        if (!\Illuminate\Support\Facades\Schema::hasTable('course_access_controls')) {
+            $notify[] = ['error', 'Course access controls table is missing. Please run migration first.'];
+            return back()->withNotify($notify);
+        }
+
+        if ($request->action === 'reset') {
+            CourseAccessControl::where('user_id', $user->id)
+                ->where('course_id', $course->id)
+                ->delete();
+
+            $notify[] = ['success', 'Course access override reset successfully'];
+            return back()->withNotify($notify);
+        }
+
+        $isLocked = $request->action === 'lock';
+
+        CourseAccessControl::updateOrCreate(
+            [
+                'user_id'   => $user->id,
+                'course_id' => $course->id,
+            ],
+            [
+                'is_locked'  => $isLocked,
+                'updated_by' => auth('admin')->id(),
+            ]
+        );
+
+        $message = $isLocked ? 'Course locked for this user successfully' : 'Course unlocked for this user successfully';
+        $notify[] = ['success', $message];
+        return back()->withNotify($notify);
     }
 
     public function update(Request $request, $id)

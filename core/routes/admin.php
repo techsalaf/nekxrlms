@@ -116,6 +116,7 @@ Route::middleware('admin')->group(function () {
         Route::get('list', 'list')->name('list');
         Route::get('count-by-segment/{methodName}', 'countBySegment')->name('segment.count');
         Route::get('notification-log/{id}', 'notificationLog')->name('notification.log');
+        Route::post('course-access/{id}', 'updateCourseAccess')->name('course.access');
     });
 
     // Subscriber

@@ -192,6 +192,103 @@
                     </form>
                 </div>
             </div>
+
+            <div class="card mt-30">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">@lang('Course Access Control')</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-3">
+                        <i class="las la-info-circle"></i>
+                        @lang('Use Unlock to grant access manually (including users who paid outside the platform), Lock to block access, and Reset to return to default purchase/free rules.')
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table--light style--two">
+                            <thead>
+                                <tr>
+                                    <th>@lang('Course')</th>
+                                    <th>@lang('Premium')</th>
+                                    <th>@lang('Purchased')</th>
+                                    <th>@lang('Manual Override')</th>
+                                    <th>@lang('Effective Access')</th>
+                                    <th>@lang('Action')</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($courses as $course)
+                                    @php
+                                        $override = $accessOverrides->get($course->id);
+                                        $isPurchased = in_array($course->id, $purchasedCourseIds);
+                                        $isAllowed = coursePermissionById($course->id, (bool) $course->premium, $user->id);
+                                    @endphp
+                                    <tr>
+                                        <td>{{ __($course->title) }}</td>
+                                        <td>
+                                            @if($course->premium)
+                                                <span class="badge badge--success">@lang('Yes')</span>
+                                            @else
+                                                <span class="badge badge--warning">@lang('No')</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isPurchased)
+                                                <span class="badge badge--success">@lang('Yes')</span>
+                                            @else
+                                                <span class="badge badge--dark">@lang('No')</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($override)
+                                                @if($override->is_locked)
+                                                    <span class="badge badge--danger">@lang('Locked')</span>
+                                                @else
+                                                    <span class="badge badge--success">@lang('Unlocked')</span>
+                                                @endif
+                                            @else
+                                                <span class="badge badge--info">@lang('Default')</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($isAllowed)
+                                                <span class="badge badge--success">@lang('Allowed')</span>
+                                            @else
+                                                <span class="badge badge--danger">@lang('Blocked')</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div class="d-flex gap-1 flex-wrap">
+                                                <form action="{{ route('admin.users.course.access', $user->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                                    <input type="hidden" name="action" value="unlock">
+                                                    <button type="submit" class="btn btn-sm btn-outline--success">@lang('Unlock')</button>
+                                                </form>
+                                                <form action="{{ route('admin.users.course.access', $user->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                                    <input type="hidden" name="action" value="lock">
+                                                    <button type="submit" class="btn btn-sm btn-outline--danger">@lang('Lock')</button>
+                                                </form>
+                                                <form action="{{ route('admin.users.course.access', $user->id) }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="course_id" value="{{ $course->id }}">
+                                                    <input type="hidden" name="action" value="reset">
+                                                    <button type="submit" class="btn btn-sm btn-outline--primary">@lang('Reset')</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td class="text-center" colspan="100%">@lang('No course found')</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

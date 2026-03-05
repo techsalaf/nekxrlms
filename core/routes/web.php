@@ -26,6 +26,7 @@ Route::controller('SiteController')->group(function () {
     Route::post('course/reviews', 'loadReview')->name('course.reviews');
 
     Route::get('course/lessons/{slug}/{id}', 'courseLessons')->name('course.lesson');
+    Route::post('course/lesson/complete/{id}', 'completeLesson')->middleware('auth')->name('course.lesson.complete');
     Route::get('lesson/asset/download/{id}', 'downloadLessonAsset')->name('lesson.asset.download');
 
     Route::get('category/{slug}/{id}', 'courseByCategory')->name('category.course');

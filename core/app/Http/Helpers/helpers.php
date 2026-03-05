@@ -518,35 +518,113 @@ function durationTimeFormat($seconds)
 
 function lessonPermission($lesson)
 {
-    if ($lesson->premium) {
-        if (auth()->check()) {
-            $user             = auth()->user();
-            $purchasesCourses = $user->coursePurchases->pluck('course_id')->toArray();
-            $lessonPermission = in_array($lesson->course_id, $purchasesCourses);
-        } else {
-            $lessonPermission = false;
-        }
-    } else {
-        $lessonPermission = true;
+    $userId = auth()->id();
+
+    if (!coursePermissionById($lesson->course_id, (bool) $lesson->premium, $userId)) {
+        return false;
     }
 
-    return $lessonPermission;
+    if (!lessonDripUnlocked($lesson, $userId)) {
+        return false;
+    }
+
+    return true;
 }
 function purchase($course)
 {
-    if ($course->premium) {
-        if (auth()->check()) {
-            $user             = auth()->user();
-            $purchasesCourses = $user->coursePurchases->pluck('course_id')->toArray();
-            $lessonPermission = in_array($course->id, $purchasesCourses);
-        } else {
-            $lessonPermission = false;
-        }
-    } else {
-        $lessonPermission = true;
+    return coursePermissionById($course->id, (bool) $course->premium, auth()->id());
+}
+
+function coursePermissionById($courseId, $isPremium, $userId = null)
+{
+    $userId = $userId ?: auth()->id();
+
+    if (!$userId) {
+        return !$isPremium;
     }
 
-    return $lessonPermission;
+    static $hasAccessControlTable;
+    if ($hasAccessControlTable === null) {
+        $hasAccessControlTable = \Illuminate\Support\Facades\Schema::hasTable('course_access_controls');
+    }
+
+    if ($hasAccessControlTable) {
+        $override = \App\Models\CourseAccessControl::where('user_id', $userId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if ($override) {
+            return !$override->is_locked;
+        }
+    }
+
+    if (!$isPremium) {
+        return true;
+    }
+
+    return \App\Models\CoursePurchase::where('user_id', $userId)
+        ->where('course_id', $courseId)
+        ->exists();
+}
+
+function lessonCompletedByUser($lessonId, $userId = null)
+{
+    $userId = $userId ?: auth()->id();
+    if (!$userId) {
+        return false;
+    }
+
+    static $hasCompletionTable;
+    if ($hasCompletionTable === null) {
+        $hasCompletionTable = \Illuminate\Support\Facades\Schema::hasTable('lesson_completions');
+    }
+
+    if (!$hasCompletionTable) {
+        return false;
+    }
+
+    return \App\Models\LessonCompletion::where('user_id', $userId)
+        ->where('lesson_id', $lessonId)
+        ->exists();
+}
+
+function lessonDripUnlocked($lesson, $userId = null)
+{
+    $userId = $userId ?: auth()->id();
+
+    if (!$userId) {
+        return true;
+    }
+
+    static $hasCompletionTable;
+    if ($hasCompletionTable === null) {
+        $hasCompletionTable = \Illuminate\Support\Facades\Schema::hasTable('lesson_completions');
+    }
+
+    if (!$hasCompletionTable) {
+        return true;
+    }
+
+    $orderedLessonIds = \App\Models\Lesson::where('course_id', $lesson->course_id)
+        ->where('status', \App\Constants\Status::ENABLE)
+        ->orderBy('section_id')
+        ->orderBy('id')
+        ->pluck('id')
+        ->values();
+
+    $currentIndex = $orderedLessonIds->search($lesson->id);
+    if ($currentIndex === false || $currentIndex === 0) {
+        return true;
+    }
+
+    $requiredPreviousLessonIds = $orderedLessonIds->slice(0, $currentIndex);
+
+    $completedCount = \App\Models\LessonCompletion::where('user_id', $userId)
+        ->whereIn('lesson_id', $requiredPreviousLessonIds)
+        ->distinct('lesson_id')
+        ->count('lesson_id');
+
+    return $completedCount >= $requiredPreviousLessonIds->count();
 }
 
 function ratingStar($rating = 0)

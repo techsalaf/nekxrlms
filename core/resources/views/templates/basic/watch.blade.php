@@ -4,9 +4,11 @@
     <main class="main-wrapper">
         <div class="course-view-page">
             <div class="custom--container">
-                <div class="row gy-4 gy-lg-0 gx-lg-4">
-                    <div class="col-lg-8">
+                <div class="row gy-4">
+                    <div class="col-12">
                         <div class="course-view-inner course-view-inner-left">
+                            <h5 class="title mb-3">{{ __($course->title) }} — {{ __($currentLesson->title) }}</h5>
+
                             @if ($currentLesson->server == 2 || $currentLesson->server == 3)
                                 <iframe width="100%" height="500px" src="{{ convertToEmbedUrl($currentLesson->path) }}"
                                     frameborder="0" allowfullscreen></iframe>
@@ -23,74 +25,80 @@
                                     </p>
                                 </video>
                             @endif
+
+                            @if (auth()->check())
+                                @php
+                                    $currentLessonState = $lessonStates[$currentLesson->id] ?? ['is_locked' => false, 'is_completed' => false];
+                                @endphp
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button id="markCompleteBtn" class="btn btn--base"
+                                        @if ($currentLessonState['is_completed']) disabled @endif>
+                                        @if ($currentLessonState['is_completed'])
+                                            <i class="las la-check-circle"></i> @lang('Completed')
+                                        @else
+                                            <i class="las la-check"></i> @lang('Mark as Completed')
+                                        @endif
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
-                    <div class="col-lg-4">
-                        <div class="course-view-inner course-view-inner-right">
-                            <h5 class="title">{{ __($course->title) }}</h5>
+                    <div class="col-12">
+                        <div class="course-view-box course-view-box--two">
+                            <h5 class="course-view-title">@lang('Lesson Feed')</h5>
 
-                            <div class="accordion" id="course-content-accordion">
-                                @foreach ($course->sections as $section)
-                                    <div class="accordion-item">
-                                        <div class="accordion-header">
-                                            <button
-                                                class="accordion-button @if ($section->id != $currentLesson->section_id) collapsed @endif"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#course-content-accordion-item-{{ $loop->iteration }}"
-                                                type="button"
-                                                aria-expanded="{{ $section->id == $currentLesson->section_id ? 'true' : 'false' }}"
-                                                aria-controls="course-content-accordion-item-{{ $loop->iteration }}">
-                                                <div class="accordion-headings">
-                                                    <h5 class="heading">@lang('Section - '){{ $loop->iteration }}:
-                                                        {{ __($section->title) }}</h5>
-                                                    <span
-                                                        class="sub-heading">{{ secondsToHMS($section->lessons->sum('video_duration')) }}</span>
-                                                </div>
-                                            </button>
-                                        </div>
-
-                                        <div class="accordion-collapse @if ($section->id == $currentLesson->section_id) show @endif collapse"
-                                            id="course-content-accordion-item-{{ $loop->iteration }}"
-                                            data-bs-parent="#course-content-accordion">
-                                            <div class="accordion-body">
-                                                <ul class="course-lesson-content">
-                                                    @foreach ($section->lessons as $lesson)
-                                                        @php
-                                                            $lessonUrl = lessonPermission($lesson)
-                                                                ? route('course.lesson', [
-                                                                    slug($lesson->title),
-                                                                    $lesson->id,
-                                                                ])
-                                                                : 'javascript:void(0)';
-                                                        @endphp
-                                                        <li class="course-lesson-content-item">
-                                                            <a class="course-lesson-content-video-link"
-                                                                href="{{ $lessonUrl }}">
-                                                                @if ($lesson->id != $currentLesson->id)
-                                                                    <span class="icon"><i
-                                                                            class="far fa-check-circle"></i></span>
-                                                                @else
-                                                                    <span class="icon scroll-here"><i
-                                                                            class="fas fa-check-circle"></i></span>
-                                                                @endif
-                                                                <span class="text">{{ $loop->iteration }}.
-                                                                    {{ __($lesson->title) }}</span>
-                                                                <span
-                                                                    class="duration">{{ secondsToHMS($lesson->video_duration) }}</span>
-                                                            </a>
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                        </div>
+                            @foreach ($course->sections as $section)
+                                <div class="lesson-section mb-4">
+                                    <div class="lesson-section-head">
+                                        <h6 class="mb-1">@lang('Section - '){{ $loop->iteration }}: {{ __($section->title) }}</h6>
+                                        <small class="text-muted">{{ secondsToHMS($section->lessons->sum('video_duration')) }}</small>
                                     </div>
-                                @endforeach
-                            </div>
+
+                                    <div class="lesson-feed-list">
+                                        @foreach ($section->lessons as $lesson)
+                                            @php
+                                                $state = $lessonStates[$lesson->id] ?? ['is_locked' => !lessonPermission($lesson), 'is_completed' => in_array($lesson->id, $completedLessonIdsArray ?? [])];
+                                                $isLocked = $state['is_locked'];
+                                                $isCompleted = $state['is_completed'];
+                                                $isCurrent = $lesson->id == $currentLesson->id;
+                                                $lessonUrl = $isLocked
+                                                    ? 'javascript:void(0)'
+                                                    : route('course.lesson', [slug($lesson->title), $lesson->id]);
+                                            @endphp
+
+                                            <a href="{{ $lessonUrl }}"
+                                                class="lesson-feed-item {{ $isCurrent ? 'active' : '' }} {{ $isLocked ? 'locked' : '' }}">
+                                                <div class="lesson-thumb-wrap">
+                                                    <img src="{{ getImage(getFilePath('video_thumb') . '/' . $lesson->thumb_image, getFileSize('video_thumb')) }}"
+                                                        alt="{{ __($lesson->title) }}" class="lesson-thumb">
+                                                </div>
+                                                <div class="lesson-meta-wrap">
+                                                    <div class="lesson-title-row">
+                                                        <h6 class="lesson-title mb-0">{{ __($lesson->title) }}</h6>
+                                                        <span class="lesson-duration">{{ secondsToHMS($lesson->video_duration) }}</span>
+                                                    </div>
+                                                    <div class="lesson-status-row">
+                                                        @if ($isLocked)
+                                                            <span class="lesson-status lock"><i class="las la-lock"></i> @lang('Locked')</span>
+                                                        @elseif($isCompleted)
+                                                            <span class="lesson-status done"><i class="las la-check-circle"></i> @lang('Completed')</span>
+                                                        @elseif($isCurrent)
+                                                            <span class="lesson-status current"><i class="las la-play-circle"></i> @lang('Now Watching')</span>
+                                                        @else
+                                                            <span class="lesson-status open"><i class="las la-unlock"></i> @lang('Unlocked')</span>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
 
-                    <div class="col-lg-8">
+                    <div class="col-12">
                         <div class="course-view-box course-view-box--one">
                             <span class="course-view-subtitle">
                                 @lang('Course overview')
@@ -280,6 +288,128 @@
                 height: 204px;
             }
         }
+
+        .lesson-section-head {
+            border-left: 3px solid hsl(var(--base));
+            padding-left: 12px;
+            margin-bottom: 14px;
+        }
+
+        .lesson-feed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 560px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .lesson-feed-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: hsl(var(--white));
+            border: 1px solid hsl(var(--black)/0.08);
+            border-radius: 12px;
+            padding: 10px;
+            text-decoration: none;
+            transition: all .2s;
+        }
+
+        .lesson-feed-item:hover {
+            border-color: hsl(var(--base)/0.5);
+            transform: translateY(-1px);
+        }
+
+        .lesson-feed-item.active {
+            border-color: hsl(var(--base));
+            box-shadow: 0 0 0 2px hsl(var(--base)/0.1);
+        }
+
+        .lesson-feed-item.locked {
+            opacity: .78;
+        }
+
+        .lesson-thumb-wrap {
+            width: 160px;
+            min-width: 160px;
+            height: 90px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: hsl(var(--black)/0.05);
+        }
+
+        .lesson-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .lesson-meta-wrap {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .lesson-title-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .lesson-title {
+            color: hsl(var(--heading-color));
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lesson-duration {
+            color: hsl(var(--body-color));
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .lesson-status-row {
+            margin-top: 8px;
+        }
+
+        .lesson-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .lesson-status.lock {
+            color: #dc3545;
+        }
+
+        .lesson-status.done {
+            color: #198754;
+        }
+
+        .lesson-status.current {
+            color: hsl(var(--base));
+        }
+
+        .lesson-status.open {
+            color: #0d6efd;
+        }
+
+        @media screen and (max-width: 575px) {
+            .lesson-feed-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .lesson-thumb-wrap {
+                width: 100%;
+                min-width: 100%;
+                height: 180px;
+            }
+        }
     </style>
 @endpush
 
@@ -287,17 +417,56 @@
     <script>
         (function($) {
             "use strict";
-            $(document).ready(function() {
-                var scrollHereElement = $(".scroll-here").first();
 
-                if (scrollHereElement.length) {
-                    var container = $(".course-view-inner-right");
-                    container.animate({
-                        scrollTop: scrollHereElement.offset().top - container.offset().top + container
-                            .scrollTop()
-                    }, 1000);
+            @if (auth()->check())
+                let completionInProgress = false;
+
+                const markComplete = function() {
+                    if (completionInProgress) {
+                        return;
+                    }
+
+                    const btn = $('#markCompleteBtn');
+                    if (!btn.length || btn.prop('disabled')) {
+                        return;
+                    }
+
+                    completionInProgress = true;
+                    btn.attr('disabled', true);
+
+                    $.post(`{{ route('course.lesson.complete', $currentLesson->id) }}`, {
+                        _token: '{{ csrf_token() }}'
+                    }).done(function(response) {
+                        btn.html('<i class="las la-check-circle"></i> @lang('Completed')');
+                        if (typeof notify === 'function') {
+                            notify('success', response.message || `@lang('Lesson marked as completed')`);
+                        }
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 700);
+                    }).fail(function(xhr) {
+                        completionInProgress = false;
+                        btn.attr('disabled', false);
+                        const message = xhr?.responseJSON?.message || `@lang('Something went wrong. Please try again.')`;
+                        if (typeof notify === 'function') {
+                            notify('error', message);
+                        }
+                    });
+                };
+
+                $('#markCompleteBtn').on('click', function(e) {
+                    e.preventDefault();
+                    markComplete();
+                });
+
+                // Auto-complete local video lessons when playback ends.
+                const nativeVideo = document.querySelector('#your-video_html5_api') || document.querySelector('#your-video');
+                if (nativeVideo && nativeVideo.tagName && nativeVideo.tagName.toLowerCase() === 'video') {
+                    nativeVideo.addEventListener('ended', function() {
+                        markComplete();
+                    });
                 }
-            });
+            @endif
         })(jQuery);
     </script>
 @endpush
