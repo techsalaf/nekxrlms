@@ -13,6 +13,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: 🔐 Prepare deploy hook token file
+        env:
+          DEPLOY_HOOK_TOKEN: ${{ secrets.DEPLOY_HOOK_TOKEN }}
+        run: |
+          if [ -z "$DEPLOY_HOOK_TOKEN" ]; then
+            echo "DEPLOY_HOOK_TOKEN is missing."
+            exit 1
+          fi
+
+          mkdir -p core/storage/app
+          printf "%s" "$DEPLOY_HOOK_TOKEN" > core/storage/app/deploy_hook_token.txt
+
       - name: 🚀 Deploy via LFTP (Fast & Incremental)
         run: |
           sudo apt-get update && sudo apt-get install -y lftp

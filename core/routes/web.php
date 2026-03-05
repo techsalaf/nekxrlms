@@ -11,6 +11,13 @@ Route::get('/deploy/run-migrations', function () {
     $token = request()->header('X-DEPLOY-TOKEN');
     $expectedToken = env('DEPLOY_HOOK_TOKEN');
 
+    if (!$expectedToken) {
+        $tokenFile = storage_path('app/deploy_hook_token.txt');
+        if (file_exists($tokenFile)) {
+            $expectedToken = trim((string) file_get_contents($tokenFile));
+        }
+    }
+
     if (!$expectedToken || !$token || !hash_equals($expectedToken, $token)) {
         abort(403);
     }
