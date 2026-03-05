@@ -8,6 +8,8 @@ Route::get('/clear', function () {
 });
 
 Route::get('/deploy/run-migrations', function () {
+    @set_time_limit(0);
+
     $token = request()->header('X-DEPLOY-TOKEN');
     $expectedToken = env('DEPLOY_HOOK_TOKEN');
 
@@ -22,98 +24,69 @@ Route::get('/deploy/run-migrations', function () {
         abort(403);
     }
 
-    $baselineApplied = [];
     $installOutput = '';
+    $warnings = [];
+    $baselineApplied = [];
+    $targetedMigrationOutput = [];
 
-    $baselineMigrations = [
-        '0001_01_01_000000_create_users_table' => 'users',
-        '0001_01_01_000001_create_cache_table' => 'cache',
-        '0001_01_01_000002_create_jobs_table' => 'jobs',
+    $requiredMigrations = [
+        [
+            'name'  => '2026_03_05_000001_create_course_access_controls_table',
+            'table' => 'course_access_controls',
+            'path'  => 'database/migrations/2026_03_05_000001_create_course_access_controls_table.php',
+        ],
+        [
+            'name'  => '2026_03_05_000002_create_lesson_completions_table',
+            'table' => 'lesson_completions',
+            'path'  => 'database/migrations/2026_03_05_000002_create_lesson_completions_table.php',
+        ],
     ];
 
-    $ensureBaseline = function () use (&$baselineApplied, &$installOutput, $baselineMigrations) {
+    try {
         if (!\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
             Artisan::call('migrate:install');
             $installOutput = trim(Artisan::output());
         }
 
-        if (!\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
-            return;
-        }
-
         $batch = (int) (\Illuminate\Support\Facades\DB::table('migrations')->max('batch') ?: 1);
 
-        foreach ($baselineMigrations as $migration => $table) {
-            if (!\Illuminate\Support\Facades\Schema::hasTable($table)) {
+        foreach ($requiredMigrations as $migration) {
+            $alreadyRecorded = \Illuminate\Support\Facades\DB::table('migrations')
+                ->where('migration', $migration['name'])
+                ->exists();
+
+            if ($alreadyRecorded) {
+                $targetedMigrationOutput[$migration['name']] = 'Already recorded';
                 continue;
             }
 
-            $exists = \Illuminate\Support\Facades\DB::table('migrations')->where('migration', $migration)->exists();
-            if (!$exists) {
+            if (\Illuminate\Support\Facades\Schema::hasTable($migration['table'])) {
                 \Illuminate\Support\Facades\DB::table('migrations')->insert([
-                    'migration' => $migration,
+                    'migration' => $migration['name'],
                     'batch'     => $batch,
                 ]);
-                $baselineApplied[] = $migration;
+                $baselineApplied[] = $migration['name'];
+                $targetedMigrationOutput[$migration['name']] = 'Table exists; migration baseline inserted';
+                continue;
             }
+
+            Artisan::call('migrate', [
+                '--force' => true,
+                '--path'  => $migration['path'],
+            ]);
+            $targetedMigrationOutput[$migration['name']] = trim(Artisan::output());
         }
-    };
-
-    $targetedMigrationOutput = [];
-
-    try {
-        $ensureBaseline();
-
-        Artisan::call('migrate', ['--force' => true]);
-        $migrateOutput = trim(Artisan::output());
     } catch (\Throwable $e) {
-        $firstError = $e->getMessage();
-
-        if (stripos($firstError, 'already exists') !== false) {
-            try {
-                $ensureBaseline();
-                Artisan::call('migrate', ['--force' => true]);
-                $migrateOutput = trim(Artisan::output());
-            } catch (\Throwable $retryEx) {
-                try {
-                    $targetedMigrations = [
-                        'database/migrations/2026_03_05_000001_create_course_access_controls_table.php',
-                        'database/migrations/2026_03_05_000002_create_lesson_completions_table.php',
-                    ];
-
-                    foreach ($targetedMigrations as $path) {
-                        Artisan::call('migrate', [
-                            '--force' => true,
-                            '--path'  => $path,
-                        ]);
-                        $targetedMigrationOutput[$path] = trim(Artisan::output());
-                    }
-
-                    $migrateOutput = 'Full migrate failed on legacy tables; targeted migrations executed.';
-                } catch (\Throwable $targetedEx) {
-                    return response()->json([
-                        'status' => 'error',
-                        'stage' => 'migrate_retry',
-                        'message' => $retryEx->getMessage(),
-                        'targeted_message' => $targetedEx->getMessage(),
-                        'first_error' => $firstError,
-                        'migrate_install' => $installOutput,
-                        'baseline_applied' => $baselineApplied,
-                    ], 500);
-                }
-            }
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'stage' => 'migrate',
-                'message' => $firstError,
-                'migrate_install' => $installOutput,
-                'baseline_applied' => $baselineApplied,
-            ], 500);
-        }
+        return response()->json([
+            'status' => 'error',
+            'stage' => 'targeted_migrate',
+            'message' => $e->getMessage(),
+            'migrate_install' => $installOutput,
+            'baseline_applied' => $baselineApplied,
+            'targeted_migrations' => $targetedMigrationOutput,
+        ], 500);
     }
 
-    $warnings = [];
     $clearOutput = '';
     $optimizeOutput = '';
 
@@ -136,7 +109,7 @@ Route::get('/deploy/run-migrations', function () {
         'message' => 'Deployment hook executed',
         'migrate_install' => $installOutput,
         'baseline_applied' => $baselineApplied,
-        'migrate' => $migrateOutput,
+        'migrate' => 'Targeted migration strategy completed',
         'targeted_migrations' => $targetedMigrationOutput,
         'optimize_clear' => $clearOutput,
         'optimize' => $optimizeOutput,
