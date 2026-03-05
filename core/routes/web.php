@@ -59,6 +59,8 @@ Route::get('/deploy/run-migrations', function () {
         }
     };
 
+    $targetedMigrationOutput = [];
+
     try {
         $ensureBaseline();
 
@@ -67,20 +69,38 @@ Route::get('/deploy/run-migrations', function () {
     } catch (\Throwable $e) {
         $firstError = $e->getMessage();
 
-        if (str_contains(strtolower($firstError), 'already exists')) {
+        if (stripos($firstError, 'already exists') !== false) {
             try {
                 $ensureBaseline();
                 Artisan::call('migrate', ['--force' => true]);
                 $migrateOutput = trim(Artisan::output());
             } catch (\Throwable $retryEx) {
-                return response()->json([
-                    'status' => 'error',
-                    'stage' => 'migrate_retry',
-                    'message' => $retryEx->getMessage(),
-                    'first_error' => $firstError,
-                    'migrate_install' => $installOutput,
-                    'baseline_applied' => $baselineApplied,
-                ], 500);
+                try {
+                    $targetedMigrations = [
+                        'database/migrations/2026_03_05_000001_create_course_access_controls_table.php',
+                        'database/migrations/2026_03_05_000002_create_lesson_completions_table.php',
+                    ];
+
+                    foreach ($targetedMigrations as $path) {
+                        Artisan::call('migrate', [
+                            '--force' => true,
+                            '--path'  => $path,
+                        ]);
+                        $targetedMigrationOutput[$path] = trim(Artisan::output());
+                    }
+
+                    $migrateOutput = 'Full migrate failed on legacy tables; targeted migrations executed.';
+                } catch (\Throwable $targetedEx) {
+                    return response()->json([
+                        'status' => 'error',
+                        'stage' => 'migrate_retry',
+                        'message' => $retryEx->getMessage(),
+                        'targeted_message' => $targetedEx->getMessage(),
+                        'first_error' => $firstError,
+                        'migrate_install' => $installOutput,
+                        'baseline_applied' => $baselineApplied,
+                    ], 500);
+                }
             }
         } else {
             return response()->json([
@@ -117,6 +137,7 @@ Route::get('/deploy/run-migrations', function () {
         'migrate_install' => $installOutput,
         'baseline_applied' => $baselineApplied,
         'migrate' => $migrateOutput,
+        'targeted_migrations' => $targetedMigrationOutput,
         'optimize_clear' => $clearOutput,
         'optimize' => $optimizeOutput,
         'warnings' => $warnings,
