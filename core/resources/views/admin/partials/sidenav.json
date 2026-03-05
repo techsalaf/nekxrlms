@@ -133,6 +133,12 @@
                 "title": "Send Notification",
                 "route_name": "admin.users.notification.all",
                 "menu_active": "admin.users.notification.all"
+            },
+            {
+                "keyword": ["course access control", "course lock", "course unlock", "manage user courses", "manual access"],
+                "title": "Course Access Control",
+                "route_name": "admin.users.all",
+                "menu_active": ["admin.users.all", "admin.users.detail"]
             }
         ]
     },
