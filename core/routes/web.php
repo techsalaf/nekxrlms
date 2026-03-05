@@ -22,7 +22,40 @@ Route::get('/deploy/run-migrations', function () {
         abort(403);
     }
 
+    $baselineApplied = [];
+    $installOutput = '';
+
     try {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
+            Artisan::call('migrate:install');
+            $installOutput = trim(Artisan::output());
+        }
+
+        if (\Illuminate\Support\Facades\Schema::hasTable('migrations')) {
+            $baselineMigrations = [
+                '0001_01_01_000000_create_users_table' => 'users',
+                '0001_01_01_000001_create_cache_table' => 'cache',
+                '0001_01_01_000002_create_jobs_table' => 'jobs',
+            ];
+
+            $batch = (int) (\Illuminate\Support\Facades\DB::table('migrations')->max('batch') ?: 1);
+
+            foreach ($baselineMigrations as $migration => $table) {
+                if (!\Illuminate\Support\Facades\Schema::hasTable($table)) {
+                    continue;
+                }
+
+                $exists = \Illuminate\Support\Facades\DB::table('migrations')->where('migration', $migration)->exists();
+                if (!$exists) {
+                    \Illuminate\Support\Facades\DB::table('migrations')->insert([
+                        'migration' => $migration,
+                        'batch'     => $batch,
+                    ]);
+                    $baselineApplied[] = $migration;
+                }
+            }
+        }
+
         Artisan::call('migrate', ['--force' => true]);
         $migrateOutput = trim(Artisan::output());
     } catch (\Throwable $e) {
@@ -54,6 +87,8 @@ Route::get('/deploy/run-migrations', function () {
     return response()->json([
         'status' => 'success',
         'message' => 'Deployment hook executed',
+        'migrate_install' => $installOutput,
+        'baseline_applied' => $baselineApplied,
         'migrate' => $migrateOutput,
         'optimize_clear' => $clearOutput,
         'optimize' => $optimizeOutput,
