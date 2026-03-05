@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -60,7 +61,25 @@ jobs:
             exit 1
           fi
 
+          BASE_URL="${DEPLOY_HOOK_URL%/deploy/run-migrations}"
+
+          # Ensure fresh routes/config before calling the new hook route
+          echo "Clearing app cache via /clear endpoint..."
+          curl -fsS --retry 2 --retry-delay 3 "$BASE_URL/clear" || true
+
           echo "Calling deploy hook..."
-          curl -fsS --retry 3 --retry-delay 5 \
+          RESPONSE=$(curl -sS --retry 3 --retry-delay 5 \
             -H "X-DEPLOY-TOKEN: $DEPLOY_HOOK_TOKEN" \
-            "$DEPLOY_HOOK_URL"
+            -w "\n%{http_code}" \
+            "$DEPLOY_HOOK_URL")
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "Deploy hook HTTP: $HTTP_CODE"
+          echo "$BODY"
+
+          if [ "$HTTP_CODE" -lt 200 ] || [ "$HTTP_CODE" -ge 300 ]; then
+            echo "Deploy hook failed with HTTP $HTTP_CODE"
+            exit 1
+          fi
