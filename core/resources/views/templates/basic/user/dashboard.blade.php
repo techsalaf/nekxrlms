@@ -9,6 +9,11 @@
                     <div class="dashboard-card__content">
                         <h4 class="dashboard-card__content__number">{{ $widget['total_accessible'] < 10 ? '0' . $widget['total_accessible'] : $widget['total_accessible'] }}</h4>
                         <span>@lang('Accessible Courses')</span>
+                        <small class="d-block text-muted mt-1">
+                            @lang('Purchased'): {{ $widget['accessible_purchased'] < 10 ? '0' . $widget['accessible_purchased'] : $widget['accessible_purchased'] }}
+                            |
+                            @lang('Manual Access'): {{ $widget['total_manual_access'] < 10 ? '0' . $widget['total_manual_access'] : $widget['total_manual_access'] }}
+                        </small>
                     </div>
                     <div class="dashboard-card__right">
                         <div class="dashboard-card__icon">

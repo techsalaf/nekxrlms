@@ -9,7 +9,14 @@
     </div>
     <div class="course__content">
         <div class="course__title">
-            <h3 class="course__name">{{ __($course->title) }}</h3>
+            <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap mb-1">
+                <h3 class="course__name mb-0">{{ __($course->title) }}</h3>
+                @if (!empty($myCourse->is_manual_access))
+                    <span class="badge badge--info">@lang('Manual Access')</span>
+                @else
+                    <span class="badge badge--success">@lang('Purchased')</span>
+                @endif
+            </div>
             <div class="flex-align">
                 <div class="review-card-ratings">
                     @php

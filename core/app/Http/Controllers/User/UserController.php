@@ -80,6 +80,8 @@ class UserController extends Controller
 
         $widget['total_purchased']      = $purchasedCourseIds->count();
         $widget['total_accessible']     = $courseItems->count();
+        $widget['accessible_purchased'] = $courseItems->where('is_purchased', true)->count();
+        $widget['total_manual_access']  = $courseItems->where('is_manual_access', true)->count();
         $widget['total_review']         = Review::where('user_id', auth()->id())->count();
         $widget['total_support_ticket'] = SupportTicket::where('user_id', auth()->id())->count();
 
