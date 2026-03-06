@@ -203,6 +203,75 @@
                         @lang('Use Unlock to grant access manually (including users who paid outside the platform), Lock to block access, and Reset to return to default purchase/free rules.')
                     </div>
 
+                    @php
+                        $totalCourseCount = $courses->count();
+                        $allowedCount = 0;
+                        $blockedCount = 0;
+                        $unlockedOverrideCount = 0;
+                        $lockedOverrideCount = 0;
+
+                        foreach ($courses as $courseStat) {
+                            $overrideStat = $accessOverrides->get($courseStat->id);
+                            if ($overrideStat) {
+                                if ($overrideStat->is_locked) {
+                                    $lockedOverrideCount++;
+                                } else {
+                                    $unlockedOverrideCount++;
+                                }
+                            }
+
+                            if (coursePermissionById($courseStat->id, (bool) $courseStat->premium, $user->id)) {
+                                $allowedCount++;
+                            } else {
+                                $blockedCount++;
+                            }
+                        }
+                    @endphp
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="border rounded p-2 h-100">
+                                <small class="text-muted d-block">@lang('Total Courses')</small>
+                                <strong>{{ $totalCourseCount }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="border rounded p-2 h-100">
+                                <small class="text-muted d-block">@lang('Allowed')</small>
+                                <strong class="text--success">{{ $allowedCount }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="border rounded p-2 h-100">
+                                <small class="text-muted d-block">@lang('Blocked')</small>
+                                <strong class="text--danger">{{ $blockedCount }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="border rounded p-2 h-100">
+                                <small class="text-muted d-block">@lang('Manual Overrides')</small>
+                                <strong>{{ $unlockedOverrideCount + $lockedOverrideCount }}</strong>
+                                <small class="d-block text-muted">@lang('Unlocked'): {{ $unlockedOverrideCount }}, @lang('Locked'): {{ $lockedOverrideCount }}</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-7">
+                            <input type="text" class="form-control" id="courseAccessSearch" placeholder="@lang('Search by course title...')">
+                        </div>
+                        <div class="col-md-5">
+                            <select id="courseAccessFilter" class="form-control">
+                                <option value="all">@lang('Show All')</option>
+                                <option value="allowed">@lang('Allowed Only')</option>
+                                <option value="blocked">@lang('Blocked Only')</option>
+                                <option value="manual">@lang('Manual Override Only')</option>
+                                <option value="purchased">@lang('Purchased Only')</option>
+                                <option value="not-purchased">@lang('Not Purchased')</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table--light style--two">
                             <thead>
@@ -221,8 +290,16 @@
                                         $override = $accessOverrides->get($course->id);
                                         $isPurchased = in_array($course->id, $purchasedCourseIds);
                                         $isAllowed = coursePermissionById($course->id, (bool) $course->premium, $user->id);
+                                        $overrideType = 'default';
+                                        if ($override) {
+                                            $overrideType = $override->is_locked ? 'locked' : 'unlocked';
+                                        }
                                     @endphp
-                                    <tr>
+                                    <tr class="course-access-row"
+                                        data-title="{{ strtolower($course->title) }}"
+                                        data-allowed="{{ $isAllowed ? '1' : '0' }}"
+                                        data-purchased="{{ $isPurchased ? '1' : '0' }}"
+                                        data-override="{{ $overrideType }}">
                                         <td>{{ __($course->title) }}</td>
                                         <td>
                                             @if($course->premium)
@@ -262,19 +339,19 @@
                                                     @csrf
                                                     <input type="hidden" name="course_id" value="{{ $course->id }}">
                                                     <input type="hidden" name="action" value="unlock">
-                                                    <button type="submit" class="btn btn-sm btn-outline--success">@lang('Unlock')</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline--success" @if($overrideType === 'unlocked') disabled @endif>@lang('Unlock')</button>
                                                 </form>
                                                 <form action="{{ route('admin.users.course.access', $user->id) }}" method="POST">
                                                     @csrf
                                                     <input type="hidden" name="course_id" value="{{ $course->id }}">
                                                     <input type="hidden" name="action" value="lock">
-                                                    <button type="submit" class="btn btn-sm btn-outline--danger">@lang('Lock')</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline--danger" @if($overrideType === 'locked') disabled @endif>@lang('Lock')</button>
                                                 </form>
                                                 <form action="{{ route('admin.users.course.access', $user->id) }}" method="POST">
                                                     @csrf
                                                     <input type="hidden" name="course_id" value="{{ $course->id }}">
                                                     <input type="hidden" name="action" value="reset">
-                                                    <button type="submit" class="btn btn-sm btn-outline--primary">@lang('Reset')</button>
+                                                    <button type="submit" class="btn btn-sm btn-outline--primary" @if($overrideType === 'default') disabled @endif>@lang('Reset')</button>
                                                 </form>
                                             </div>
                                         </td>
@@ -395,6 +472,40 @@
         $('select[name=country]').on('change',function(){
             mobileElement.text(`+${$('select[name=country] :selected').data('mobile_code')}`);
         });
+
+        const applyCourseAccessFilters = function () {
+            const search = ($('#courseAccessSearch').val() || '').toLowerCase().trim();
+            const filter = $('#courseAccessFilter').val() || 'all';
+
+            $('.course-access-row').each(function () {
+                const $row = $(this);
+                const title = ($row.data('title') || '').toString();
+                const allowed = $row.data('allowed').toString() === '1';
+                const purchased = $row.data('purchased').toString() === '1';
+                const override = ($row.data('override') || 'default').toString();
+
+                let visible = title.includes(search);
+
+                if (visible) {
+                    if (filter === 'allowed') {
+                        visible = allowed;
+                    } else if (filter === 'blocked') {
+                        visible = !allowed;
+                    } else if (filter === 'manual') {
+                        visible = override !== 'default';
+                    } else if (filter === 'purchased') {
+                        visible = purchased;
+                    } else if (filter === 'not-purchased') {
+                        visible = !purchased;
+                    }
+                }
+
+                $row.toggle(visible);
+            });
+        };
+
+        $('#courseAccessSearch').on('input', applyCourseAccessFilters);
+        $('#courseAccessFilter').on('change', applyCourseAccessFilters);
 
     })(jQuery);
 </script>

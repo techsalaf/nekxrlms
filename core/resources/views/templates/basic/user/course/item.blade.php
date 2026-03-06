@@ -33,11 +33,15 @@
             <div class="feature-list">
                 <div class="inner-list">
                     <span class="feature-list__name">@lang('Price:')</span>
-                    <span class="feature-list__value course__price">{{ showAmount($myCourse->purchased_amount) }}</span>
+                    @if (!empty($myCourse->is_manual_access))
+                        <span class="feature-list__value course__price">@lang('Manual Access')</span>
+                    @else
+                        <span class="feature-list__value course__price">{{ showAmount($myCourse->purchased_amount) }}</span>
+                    @endif
                 </div>
 
                 <div class="inner-list">
-                    <span class="feature-list__name">@lang('Purchased Date:')</span>
+                    <span class="feature-list__name">@lang('Access Date:')</span>
                     <span class="feature-list__value">{{ showDateTime($myCourse->created_at, 'd M Y') }}</span>
                 </div>
             </div>

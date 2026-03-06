@@ -11,7 +11,7 @@
                 </div>
             @else
                 @include($activeTemplate . 'partials.data_not_found', [
-                    'data' => 'No purchased course found!',
+                    'data' => 'No accessible course found!',
                 ])
             @endif
 
