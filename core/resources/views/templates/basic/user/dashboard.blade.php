@@ -7,8 +7,8 @@
             <div class="col-xl-4 col-lg-6 col-md-6 col-sm-6">
                 <div class="dashboard-card">
                     <div class="dashboard-card__content">
-                        <h4 class="dashboard-card__content__number">{{ $widget['total_purchased'] < 10 ? '0' . $widget['total_purchased'] : $widget['total_purchased'] }}</h4>
-                        <span>@lang('Course Purchased')</span>
+                        <h4 class="dashboard-card__content__number">{{ $widget['total_accessible'] < 10 ? '0' . $widget['total_accessible'] : $widget['total_accessible'] }}</h4>
+                        <span>@lang('Accessible Courses')</span>
                     </div>
                     <div class="dashboard-card__right">
                         <div class="dashboard-card__icon">
@@ -80,7 +80,7 @@
                     @endforeach
                 </div>
             @else
-                @include($activeTemplate . 'partials.data_not_found', ['data' => 'No purchased course found!'])
+                @include($activeTemplate . 'partials.data_not_found', ['data' => 'No accessible course found!'])
             @endif
         </div>
     </div>

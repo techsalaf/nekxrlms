@@ -4,11 +4,14 @@ namespace App\Http\Controllers\User;
 
 use App\Constants\Status;
 use App\Http\Controllers\Controller;
+use App\Models\Course;
+use App\Models\CourseAccessControl;
 use App\Models\CoursePurchase;
 use App\Models\DeviceToken;
 use App\Models\Review;
 use App\Models\SupportTicket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -17,16 +20,66 @@ class UserController extends Controller
     public function home()
     {
         $pageTitle = 'Dashboard';
-        $myCourses = CoursePurchase::with(['course' => function ($course) {
-            $course->withCount(['lessons' => function ($lesson) {
+        $userId = auth()->id();
+
+        $purchases = CoursePurchase::where('user_id', $userId)->orderBy('id', 'desc')->get()->keyBy('course_id');
+        $purchasedCourseIds = $purchases->keys();
+
+        $accessOverrides = collect();
+        $manuallyUnlockedCourseIds = collect();
+        $manuallyLockedCourseIds = collect();
+
+        if (Schema::hasTable('course_access_controls')) {
+            $accessOverrides = CourseAccessControl::where('user_id', $userId)->get()->keyBy('course_id');
+            $manuallyUnlockedCourseIds = $accessOverrides->where('is_locked', false)->keys();
+            $manuallyLockedCourseIds = $accessOverrides->where('is_locked', true)->keys();
+        }
+
+        $effectiveCourseIds = $purchasedCourseIds
+            ->merge($manuallyUnlockedCourseIds)
+            ->unique()
+            ->diff($manuallyLockedCourseIds)
+            ->values();
+
+        $courses = Course::active()->whereIn('id', $effectiveCourseIds)
+            ->withCount(['lessons' => function ($lesson) {
                 $lesson->active();
-            }])->withSum(['lessons as total_duration' => function ($lesson) {
+            }])
+            ->withSum(['lessons as total_duration' => function ($lesson) {
                 $lesson->active();
-            }], 'video_duration');
-        }, 'course.lessons' => function ($lesson) {
-            $lesson->active();
-        }])->where('user_id', auth()->id())->orderBy('id', 'desc')->limit(10)->get();
-        $widget['total_purchased']      = CoursePurchase::where('user_id', auth()->id())->count();
+            }], 'video_duration')
+            ->with(['lessons' => function ($lesson) {
+                $lesson->active()->orderBy('section_id')->orderBy('id');
+            }])
+            ->get()
+            ->keyBy('id');
+
+        $courseItems = $effectiveCourseIds->map(function ($courseId) use ($courses, $purchases, $accessOverrides) {
+            $course = $courses->get($courseId);
+
+            if (!$course) {
+                return null;
+            }
+
+            $purchase = $purchases->get($courseId);
+            $override = $accessOverrides->get($courseId);
+            $isPurchased = !is_null($purchase);
+
+            return (object) [
+                'course' => $course,
+                'purchased_amount' => $purchase->purchased_amount ?? 0,
+                'created_at' => $purchase->created_at ?? optional($override)->created_at ?? now(),
+                'is_manual_access' => !$isPurchased,
+                'is_purchased' => $isPurchased,
+            ];
+        })->filter()->sortByDesc(function ($item) {
+            return $item->created_at;
+        })->values();
+
+        $myCourses = $courseItems->take(10);
+
+        $widget['total_purchased']      = $purchasedCourseIds->count();
+        $widget['total_accessible']     = $courseItems->count();
         $widget['total_review']         = Review::where('user_id', auth()->id())->count();
         $widget['total_support_ticket'] = SupportTicket::where('user_id', auth()->id())->count();
 

@@ -182,7 +182,7 @@
                                            data-bs-toggle="toggle" data-on="@lang('Verified')" data-off="@lang('Unverified')" name="sv"
                                            @if($user->sv) checked @endif>
                                 </div>
-                            </div>v>
+                            </div>
                             </div>
                             <div class="col-md-12">
                                 <button type="submit" class="btn btn--primary w-100 h-45">@lang('Submit')

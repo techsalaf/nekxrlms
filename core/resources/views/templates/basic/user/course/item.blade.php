@@ -57,7 +57,11 @@
             @php
                 $firstLesson = $course->lessons->first();
             @endphp
-            <a href="{{ route('course.lesson', [slug(@$firstLesson->title), @$firstLesson->id]) }}" class="rate d-block text-decoration-underline">@lang('Rate this Course')</a>
+            @if ($firstLesson)
+                <a href="{{ route('course.lesson', [slug($firstLesson->title), $firstLesson->id]) }}" class="rate d-block text-decoration-underline">@lang('Rate this Course')</a>
+            @else
+                <span class="rate d-block text-decoration-underline text-muted">@lang('No lesson available yet')</span>
+            @endif
         @endif
 
     </div>
