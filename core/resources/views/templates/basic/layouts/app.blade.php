@@ -49,32 +49,61 @@
         /* ── DARK MODE core ── */
         html[data-theme="dark"] body              { background-color:#0d1117 !important; color:#c9d1d9 !important; }
         html[data-theme="dark"] .header           { background-color:rgba(10,14,26,.97) !important; border-bottom:1px solid rgba(240,246,252,.06) !important; box-shadow:0 2px 20px rgba(0,0,0,.6) !important; }
+        html[data-theme="dark"] .header.fixed,
+        html[data-theme="dark"] .header.sticky    { background-color:rgba(10,14,26,.99) !important; }
+        html[data-theme="dark"] .main-wrapper     { background-color:#0d1117 !important; }
         html[data-theme="dark"] .nav-link,
         html[data-theme="dark"] .navbar-nav .nav-link { color:#adbac7 !important; }
         html[data-theme="dark"] .nav-link:hover   { color:#e6edf3 !important; }
         html[data-theme="dark"] .dropdown-menu    { background-color:#161b22 !important; border-color:rgba(240,246,252,.1) !important; box-shadow:0 8px 32px rgba(0,0,0,.5) !important; }
         html[data-theme="dark"] .dropdown-item    { color:#c9d1d9 !important; }
         html[data-theme="dark"] .dropdown-item:hover { background-color:#21262d !important; }
-        html[data-theme="dark"] section,html[data-theme="dark"] .section { background-color:#111823 !important; }
+        html[data-theme="dark"] section           { background-color:#111823 !important; }
+        html[data-theme="dark"] .section-bg       { background-color:#111823 !important; }
         html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3,
         html[data-theme="dark"] h4,html[data-theme="dark"] h5,html[data-theme="dark"] h6 { color:#e6edf3 !important; }
         html[data-theme="dark"] p   { color:#c9d1d9; }
-        html[data-theme="dark"] .card,html[data-theme="dark"] .course-card { background-color:#161b22 !important; border-color:rgba(240,246,252,.08) !important; box-shadow:0 4px 20px rgba(0,0,0,.4) !important; }
-        html[data-theme="dark"] .card-body  { color:#c9d1d9 !important; background-color:#161b22 !important; }
+        /* Bootstrap .bg-white/.bg-light overrides - higher specificity beats Bootstrap's !important */
+        html[data-theme="dark"] .bg-white  { background-color:#161b22 !important; color:#c9d1d9 !important; }
+        html[data-theme="dark"] .bg-light  { background-color:#1c2128 !important; color:#c9d1d9 !important; }
+        /* Cards - generic + specific landing page card types */
+        html[data-theme="dark"] .card,
+        html[data-theme="dark"] .course-card,
+        html[data-theme="dark"] .custom--card,
+        html[data-theme="dark"] .courses-card    { background-color:#161b22 !important; border-color:rgba(240,246,252,.08) !important; box-shadow:0 4px 20px rgba(0,0,0,.4) !important; }
+        html[data-theme="dark"] .card-body,
+        html[data-theme="dark"] .custom--card .card-body,
+        html[data-theme="dark"] .course-card .card-body  { color:#c9d1d9 !important; background-color:#161b22 !important; }
         html[data-theme="dark"] .card-title { color:#e6edf3 !important; }
+        html[data-theme="dark"] .card-header,
+        html[data-theme="dark"] .custom--card .card-header { background-color:#1c2128 !important; border-bottom-color:rgba(240,246,252,.08) !important; color:#c9d1d9 !important; }
         html[data-theme="dark"] .card-footer { background-color:#1c2128 !important; border-top-color:rgba(240,246,252,.08) !important; }
+        html[data-theme="dark"] .courses-card-icon { background-color:#21262d !important; }
+        /* Banner floating cards */
+        html[data-theme="dark"] .banner-floating-cards .floating-card { background-color:#1c2128 !important; border-color:rgba(240,246,252,.15) !important; box-shadow:none !important; }
+        /* User dashboard course item */
+        html[data-theme="dark"] .course          { background-color:#161b22 !important; border-color:rgba(240,246,252,.08) !important; }
+        html[data-theme="dark"] .course__name    { color:#e6edf3 !important; }
+        html[data-theme="dark"] .dashboard-body,
+        html[data-theme="dark"] .dashboard__right,
+        html[data-theme="dark"] .my-course       { background-color:#0d1117 !important; }
+        /* Forms */
         html[data-theme="dark"] .form-control,html[data-theme="dark"] textarea,
         html[data-theme="dark"] input[type=text],html[data-theme="dark"] input[type=email],
-        html[data-theme="dark"] input[type=password] { background-color:#21262d !important; border-color:rgba(240,246,252,.12) !important; color:#c9d1d9 !important; }
+        html[data-theme="dark"] input[type=password],html[data-theme="dark"] input[type=number],
+        html[data-theme="dark"] input[type=search] { background-color:#21262d !important; border-color:rgba(240,246,252,.12) !important; color:#c9d1d9 !important; }
+        /* Footer */
         html[data-theme="dark"] .footer          { background-color:#040d2a !important; }
         html[data-theme="dark"] .footer-bottom   { background-color:#020716 !important; border-top-color:rgba(240,246,252,.08) !important; }
+        /* Modals */
         html[data-theme="dark"] .modal-content   { background-color:#161b22 !important; color:#c9d1d9 !important; }
         html[data-theme="dark"] .modal-header    { background-color:#1c2128 !important; border-bottom-color:rgba(240,246,252,.08) !important; color:#e6edf3 !important; }
         html[data-theme="dark"] .modal-footer    { background-color:#1c2128 !important; }
         html[data-theme="dark"] .btn-close       { filter:invert(.8); }
+        /* Pagination */
         html[data-theme="dark"] .page-link       { background-color:#1c2128 !important; border-color:rgba(240,246,252,.1) !important; color:#c9d1d9 !important; }
         html[data-theme="dark"] .page-item.active .page-link { background-color:hsl(var(--base)) !important; }
-        /* user dashboard sidebar */
+        /* User dashboard sidebar */
         html[data-theme="dark"] .sidebar-menu    { background-color:#0f1724 !important; border-right:1px solid rgba(240,246,252,.08) !important; }
         html[data-theme="dark"] .sidebar-menu-list__link { color:#adbac7 !important; }
         html[data-theme="dark"] .sidebar-menu-list__link:hover,
@@ -85,6 +114,37 @@
         html[data-theme="dark"] .text-muted      { color:#8b949e !important; }
         html[data-theme="dark"] hr               { border-color:rgba(240,246,252,.08) !important; }
         html[data-theme="dark"] .list-group-item { background-color:#161b22 !important; border-color:rgba(240,246,252,.08) !important; color:#c9d1d9 !important; }
+
+        /* ── LIGHT MODE explicit reverts ── */
+        html[data-theme="light"] body            { background-color:#f5f7fa !important; color:hsl(60,2%,10%) !important; }
+        html[data-theme="light"] .header         { background-color:#fff !important; border-bottom-color:rgba(0,0,0,.08) !important; box-shadow:0 1px 4px rgba(0,0,0,.06) !important; }
+        html[data-theme="light"] .sidebar-menu   { background-color:#fff !important; border-right-color:rgba(0,0,0,.1) !important; }
+        html[data-theme="light"] .user-profile   { background-color:#fff !important; border-top-color:rgba(0,0,0,.06) !important; }
+        html[data-theme="light"] .dashboard,
+        html[data-theme="light"] .dashboard__right,
+        html[data-theme="light"] .dashboard-body,
+        html[data-theme="light"] .my-course      { background-color:#f5f7fa !important; }
+        html[data-theme="light"] .dashboard-header { background-color:#fff !important; border-bottom:1px solid rgba(0,0,0,.06) !important; box-shadow:0 1px 4px rgba(0,0,0,.05) !important; backdrop-filter:none !important; }
+        html[data-theme="light"] .card,
+        html[data-theme="light"] .course-card,
+        html[data-theme="light"] .custom--card,
+        html[data-theme="light"] .courses-card,
+        html[data-theme="light"] .course         { background-color:#fff !important; border-color:rgba(0,0,0,.08) !important; box-shadow:0 2px 8px rgba(0,0,0,.06) !important; }
+        html[data-theme="light"] .card-header    { background-color:transparent !important; border-bottom-color:rgba(0,0,0,.08) !important; color:hsl(239,92%,14%) !important; }
+        html[data-theme="light"] .card-body      { background-color:#fff !important; color:hsl(60,2%,10%) !important; }
+        html[data-theme="light"] .bg-white        { background-color:#fff !important; color:hsl(60,2%,10%) !important; }
+        html[data-theme="light"] .nav-link       { color:hsl(239,92%,14%) !important; }
+        html[data-theme="light"] h1,html[data-theme="light"] h2,html[data-theme="light"] h3,
+        html[data-theme="light"] h4,html[data-theme="light"] h5,html[data-theme="light"] h6 { color:hsl(239,92%,14%) !important; }
+        html[data-theme="light"] .dropdown-menu  { background-color:#fff !important; border-color:rgba(0,0,0,.1) !important; }
+        html[data-theme="light"] .dropdown-item  { color:hsl(239,92%,14%) !important; }
+        html[data-theme="light"] .text-muted     { color:#6c757d !important; }
+        html[data-theme="light"] .theme-toggle-btn { border-color:rgba(0,0,0,.18) !important; background:rgba(0,0,0,.07) !important; }
+        html[data-theme="light"] .theme-toggle-btn .toggle-knob { background:#ffd700 !important; }
+        html[data-theme="light"] .modal-content  { background-color:#fff !important; color:hsl(60,2%,10%) !important; }
+        html[data-theme="light"] .modal-header   { background-color:#f8f9fa !important; border-bottom-color:rgba(0,0,0,.1) !important; color:hsl(239,92%,14%) !important; }
+        html[data-theme="light"] .btn-close      { filter:none !important; }
+
         /* sidebar toggle label */
         html[data-theme="dark"]  .theme-label-dark  { display:inline !important; }
         html[data-theme="dark"]  .theme-label-light { display:none   !important; }

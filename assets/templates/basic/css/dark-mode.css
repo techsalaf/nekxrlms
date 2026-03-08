@@ -349,3 +349,187 @@ html[data-theme="dark"] .sidebar-menu-list__item > button:hover {
   color: #e6edf3 !important;
 }
 html[data-theme="dark"] .sidebar-menu-list__item > button { color: #adbac7 !important; }
+
+/* ============================================================
+   ADDITIONAL DARK MODE OVERRIDES
+   Fixes for elements using hsl(var(--white)) backgrounds,
+   Bootstrap utilities, and specific landing page components.
+   ============================================================ */
+
+/* ---------- Bootstrap utility class overrides ---------- */
+/* .bg-white uses --bs-white-rgb with !important - we beat it with higher specificity */
+html[data-theme="dark"] .bg-white  { background-color: #161b22 !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .bg-light  { background-color: #1c2128 !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .bg-dark   { background-color: #0f1724 !important; }
+html[data-theme="dark"] .bg-secondary { background-color: #21262d !important; }
+html[data-theme="dark"] .text-dark { color: #e6edf3 !important; }
+html[data-theme="dark"] .text-body { color: #c9d1d9 !important; }
+html[data-theme="dark"] .border    { border-color: rgba(240,246,252,0.1) !important; }
+
+/* ---------- Landing page: header sticky/fixed states ---------- */
+html[data-theme="dark"] .header.fixed,
+html[data-theme="dark"] .header.sticky,
+html[data-theme="dark"] .header.header--fixed,
+html[data-theme="dark"] .header.header--sticky { background-color: rgba(10,14,26,0.98) !important; }
+
+/* ---------- Landing page: courses/category cards ---------- */
+html[data-theme="dark"] .courses-card {
+  background-color: #161b22 !important;
+  border: 1px solid rgba(240,246,252,0.08) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+}
+html[data-theme="dark"] .courses-card-icon {
+  background-color: #21262d !important;
+}
+html[data-theme="dark"] .courses-card-title { color: #e6edf3 !important; }
+html[data-theme="dark"] .courses-card-desc  { color: #8b949e !important; }
+
+/* ---------- Landing page: custom cards ---------- */
+html[data-theme="dark"] .custom--card,
+html[data-theme="dark"] .custom--card .card-body {
+  background-color: #161b22 !important;
+  border-color: rgba(240,246,252,0.08) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4) !important;
+}
+html[data-theme="dark"] .custom--card .card-header {
+  background-color: #1c2128 !important;
+  border-bottom-color: rgba(240,246,252,0.08) !important;
+}
+
+/* ---------- Landing page: banner floating cards ---------- */
+html[data-theme="dark"] .banner-floating-cards .floating-card {
+  background-color: #1c2128 !important;
+  border-color: rgba(240,246,252,0.15) !important;
+  box-shadow: none !important;
+}
+html[data-theme="dark"] .banner-floating-cards .floating-card-title { color: #e6edf3 !important; }
+html[data-theme="dark"] .banner-floating-cards .floating-card-info-item span { color: #8b949e !important; }
+
+/* ---------- Landing page: banner section content ---------- */
+html[data-theme="dark"] .banner-title,
+html[data-theme="dark"] .banner-subtitle { color: #e6edf3 !important; }
+html[data-theme="dark"] .banner { background-color: #0d1117 !important; }
+html[data-theme="dark"] .main-wrapper { background-color: #0d1117 !important; }
+html[data-theme="dark"] .banner-keywords-link {
+  background-color: rgba(70,52,255,0.1) !important;
+  border-color: rgba(70,52,255,0.25) !important;
+  color: #adbac7 !important;
+}
+html[data-theme="dark"] .banner-keywords-link:hover { background-color: rgba(70,52,255,0.2) !important; color: #e6edf3 !important; }
+
+/* ---------- Landing page: course cards (landing vs dashboard item) ---------- */
+html[data-theme="dark"] .course-card,
+html[data-theme="dark"] .course-card .card-header,
+html[data-theme="dark"] .course-card .card-body { background-color: #161b22 !important; }
+html[data-theme="dark"] .course-card .card-footer { background-color: #1c2128 !important; }
+html[data-theme="dark"] .course-card .card-header { border-bottom-color: rgba(240,246,252,0.06) !important; }
+html[data-theme="dark"] .course-card-title        { color: #e6edf3 !important; }
+html[data-theme="dark"] .course-card-price         { color: #79c0ff !important; }
+html[data-theme="dark"] .course-card-duration,
+html[data-theme="dark"] .course-card-info-item     { color: #8b949e !important; }
+html[data-theme="dark"] .course-card-btn-enroll    { color: hsl(var(--base)) !important; }
+
+/* ---------- User dashboard: .course item (My Course list) ---------- */
+html[data-theme="dark"] .dashboard-body,
+html[data-theme="dark"] .dashboard__right { background-color: #0d1117 !important; }
+html[data-theme="dark"] .my-course { background-color: #0d1117 !important; }
+html[data-theme="dark"] .course {
+  background-color: #161b22 !important;
+  border-color: rgba(240,246,252,0.08) !important;
+}
+html[data-theme="dark"] .course__name   { color: #e6edf3 !important; }
+html[data-theme="dark"] .course__price  { color: #79c0ff !important; }
+html[data-theme="dark"] .feature-list__name  { color: #8b949e !important; }
+html[data-theme="dark"] .feature-list__value { color: #c9d1d9 !important; }
+
+/* ---------- Testimonials, choose-us, sponsor sections ---------- */
+html[data-theme="dark"] .testimonial-card,
+html[data-theme="dark"] .testimonial-item { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .choose-us-item  { background-color: #161b22 !important; }
+html[data-theme="dark"] .course-info-item { background-color: #1c2128 !important; }
+
+/* ---------- Table backgrounds (landing page specific) ---------- */
+html[data-theme="dark"] .table-striped>tbody>tr:nth-of-type(odd)>* { background-color: rgba(240,246,252,.04) !important; }
+
+/* ============================================================
+   EXPLICIT LIGHT MODE REVERT STYLES
+   Ensures elements go back to correct light appearance when
+   toggling from dark to light mode.
+   ============================================================ */
+html[data-theme="light"] body          { background-color: #f5f7fa !important; color: hsl(60, 2%, 10%) !important; }
+html[data-theme="light"] .header       { background-color: #fff !important; border-bottom-color: rgba(0,0,0,0.08) !important; box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important; }
+html[data-theme="light"] .header.fixed,
+html[data-theme="light"] .header.sticky { background-color: #fff !important; }
+
+/* User dashboard sidebar & layout */
+html[data-theme="light"] .sidebar-menu    { background-color: #fff !important; border-right-color: rgba(0,0,0,0.1) !important; }
+html[data-theme="light"] .user-profile    { background-color: #fff !important; border-top-color: rgba(0,0,0,0.06) !important; }
+html[data-theme="light"] .user-profile-info__name { color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .user-profile-info__desc { color: rgba(0,0,0,0.5) !important; }
+html[data-theme="light"] .dashboard       { background-color: #f5f7fa !important; }
+html[data-theme="light"] .dashboard__right { background-color: #f5f7fa !important; }
+html[data-theme="light"] .dashboard-body  { background-color: #f5f7fa !important; }
+html[data-theme="light"] .my-course       { background-color: #f5f7fa !important; }
+html[data-theme="light"] .dashboard-header {
+  background-color: #fff !important;
+  border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+  backdrop-filter: none !important;
+}
+html[data-theme="light"] .dashboard-header__grettings { color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .sidebar-menu-list__link { color: hsl(239, 92%, 14%, 0.8) !important; }
+html[data-theme="light"] .sidebar-menu-list__link:hover { background-color: rgba(70,52,255,0.08) !important; color: hsl(246, 78%, 58%) !important; }
+html[data-theme="light"] .sidebar-menu-list__item.active .sidebar-menu-list__link { background-color: rgba(70,52,255,0.1) !important; color: hsl(246, 78%, 58%) !important; }
+html[data-theme="light"] .sidebar-menu-list__link .icon { color: rgba(0,0,0,0.5) !important; }
+
+/* Revert cards */
+html[data-theme="light"] .card,
+html[data-theme="light"] .course-card,
+html[data-theme="light"] .custom--card,
+html[data-theme="light"] .courses-card  { background-color: #fff !important; border-color: rgba(0,0,0,0.08) !important; box-shadow: 0 2px 10px rgba(0,0,0,0.06) !important; }
+html[data-theme="light"] .card-header  { background-color: transparent !important; border-bottom-color: rgba(0,0,0,0.08) !important; color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .card-footer  { background-color: #fff !important; border-top-color: rgba(0,0,0,0.08) !important; }
+html[data-theme="light"] .card-body    { color: hsl(60, 2%, 10%) !important; }
+
+/* Revert course items */
+html[data-theme="light"] .course       { background-color: #fff !important; border-color: rgba(0,0,0,0.08) !important; }
+html[data-theme="light"] .course__name { color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .bg-white     { background-color: #fff !important; }
+html[data-theme="light"] .bg-light     { background-color: #f8f9fa !important; }
+
+/* Revert forms */
+html[data-theme="light"] .form-control,
+html[data-theme="light"] input,
+html[data-theme="light"] textarea,
+html[data-theme="light"] select  { background-color: #fff !important; border-color: #ced4da !important; color: #495057 !important; }
+
+/* Revert dropdown */
+html[data-theme="light"] .dropdown-menu     { background-color: #fff !important; border-color: rgba(0,0,0,0.1) !important; box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important; }
+html[data-theme="light"] .dropdown-item     { color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .dropdown-item:hover { background-color: #f5f7fa !important; }
+
+/* Revert headings & text */
+html[data-theme="light"] h1, html[data-theme="light"] h2, html[data-theme="light"] h3,
+html[data-theme="light"] h4, html[data-theme="light"] h5, html[data-theme="light"] h6 { color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] p  { color: hsl(60, 2%, 10%); }
+html[data-theme="light"] .text-muted { color: #6c757d !important; }
+
+/* Revert footer (should stay branded dark) */
+html[data-theme="light"] .footer        { background-color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .footer-bottom { background-color: hsl(239, 92%, 8%) !important; }
+
+/* Revert nav links (landing page header) */
+html[data-theme="light"] .nav-link { color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .nav-link:hover { color: hsl(246, 78%, 58%) !important; }
+
+/* Toggle button for light mode */
+html[data-theme="light"] .theme-toggle-btn { border-color: rgba(0,0,0,0.18) !important; background: rgba(0,0,0,0.07) !important; }
+html[data-theme="light"] .theme-toggle-btn .toggle-knob { background: #ffd700 !important; }
+
+/* Misc light mode */
+html[data-theme="light"] hr { border-color: rgba(0,0,0,0.1) !important; }
+html[data-theme="light"] .list-group-item { background-color: #fff !important; border-color: rgba(0,0,0,0.1) !important; color: hsl(60, 2%, 10%) !important; }
+html[data-theme="light"] .modal-content   { background-color: #fff !important; color: hsl(60, 2%, 10%) !important; }
+html[data-theme="light"] .modal-header    { background-color: #f8f9fa !important; border-bottom-color: rgba(0,0,0,0.1) !important; color: hsl(239, 92%, 14%) !important; }
+html[data-theme="light"] .modal-footer    { background-color: #f8f9fa !important; }
+html[data-theme="light"] .btn-close       { filter: none !important; }

@@ -410,3 +410,27 @@ html[data-theme="light"] select { background-color: #fff !important; border-colo
 html[data-theme="light"] .select2-container--default .select2-selection--single,
 html[data-theme="light"] .select2-dropdown { background-color: #fff !important; }
 html[data-theme="light"] .input-group-text { background-color: #e9ecef !important; border-color: #ced4da !important; color: #495057 !important; }
+
+/* Bootstrap utility reverts for light mode */
+html[data-theme="light"] .bg-white    { background-color: #fff !important; }
+html[data-theme="light"] .bg-light    { background-color: #f8f9fa !important; }
+html[data-theme="light"] .text-muted  { color: #6c757d !important; }
+html[data-theme="light"] .page-wrapper,
+html[data-theme="light"] .body-wrapper,
+html[data-theme="light"] .bodywrapper__inner,
+html[data-theme="light"] .container-fluid { background-color: #f0f2f5 !important; }
+html[data-theme="light"] .breadcrumb-nav { background-color: #fff !important; }
+html[data-theme="light"] .topTap .nav-link { color: #34495e !important; }
+html[data-theme="light"] .accordion-button { background-color: #f8f9fa !important; color: #34495e !important; }
+html[data-theme="light"] .accordion-item  { background-color: #fff !important; }
+html[data-theme="light"] .btn-close       { filter: none !important; }
+html[data-theme="light"] .list-group-item { background-color: #fff !important; border-color: rgba(0,0,0,.125) !important; color: #34495e !important; }
+html[data-theme="light"] .alert-warning { background-color: #fff3cd !important; color: #856404 !important; }
+html[data-theme="light"] .alert-danger  { background-color: #f8d7da !important; color: #721c24 !important; }
+html[data-theme="light"] .alert-success { background-color: #d4edda !important; color: #155724 !important; }
+
+/* --- Dark mode: Bootstrap .bg-white override (critical for any admin views using it) --- */
+html[data-theme="dark"] .bg-white  { background-color: #161b22 !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .bg-light  { background-color: #1c2128 !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .text-dark { color: #e6edf3 !important; }
+html[data-theme="dark"] .border    { border-color: rgba(240,246,252,0.1) !important; }
