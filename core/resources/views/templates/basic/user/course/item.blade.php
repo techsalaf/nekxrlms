@@ -40,11 +40,7 @@
             <div class="feature-list">
                 <div class="inner-list">
                     <span class="feature-list__name">@lang('Price:')</span>
-                    @if (!empty($myCourse->is_manual_access))
-                        <span class="feature-list__value course__price">@lang('Manual Access')</span>
-                    @else
-                        <span class="feature-list__value course__price">{{ showAmount($myCourse->purchased_amount) }}</span>
-                    @endif
+                    <span class="feature-list__value course__price">{{ showAmount($course->price) }}</span>
                 </div>
 
                 <div class="inner-list">
