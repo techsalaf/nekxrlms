@@ -1,0 +1,351 @@
+/* =============================================================
+   NekXR LMS - Frontend Dark / Light Mode System
+   Dark = default.  Light = [data-theme="light"] override.
+   Stored in localStorage: 'nekxr_frontend_theme'
+   ============================================================= */
+
+/* ---------- Smooth transitions for all elements ---------- */
+*,
+*::before,
+*::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.15s ease, box-shadow 0.3s ease;
+}
+
+/* ===================== TOGGLE BUTTON ===================== */
+.theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 58px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  padding: 3px 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.theme-toggle-btn:hover { border-color: rgba(255,255,255,0.4); }
+.theme-toggle-btn .toggle-icon {
+  font-size: 13px;
+  line-height: 1;
+  z-index: 2;
+  transition: opacity 0.3s ease, transform 0.4s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.theme-toggle-btn .toggle-icon.sun  { color: #ffd700; }
+.theme-toggle-btn .toggle-icon.moon { color: #a8c0ff; }
+.theme-toggle-btn .toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #c9d1d9;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+  transition: transform 0.35s cubic-bezier(0.68, -0.55, 0.27, 1.55), background-color 0.3s ease;
+  z-index: 3;
+}
+/* Dark mode: knob right (#c9d1d9 crescent/moon tone), moon lit */
+html[data-theme="dark"]  .theme-toggle-btn .toggle-knob { transform: translateX(28px); background: #a8c0ff; }
+html[data-theme="dark"]  .theme-toggle-btn .toggle-icon.sun  { opacity: 0.35; }
+html[data-theme="dark"]  .theme-toggle-btn .toggle-icon.moon { opacity: 1; }
+/* Light mode: knob left (golden sun), sun lit */
+html[data-theme="light"] .theme-toggle-btn .toggle-knob { transform: translateX(0); background: #ffd700; }
+html[data-theme="light"] .theme-toggle-btn .toggle-icon.sun  { opacity: 1; }
+html[data-theme="light"] .theme-toggle-btn .toggle-icon.moon { opacity: 0.35; }
+html[data-theme="light"] .theme-toggle-btn {
+  border-color: rgba(0,0,0,0.15);
+  background: rgba(0,0,0,0.06);
+}
+
+/* ===================== DARK MODE OVERRIDES ===================== */
+/* (light mode = existing CSS is already light, no overrides needed) */
+
+/* ---------- CSS Variables override for safe properties ---------- */
+html[data-theme="dark"] {
+  color-scheme: dark;
+  /* Override semantic color vars that are used ONLY for backgrounds/text (not white-on-dark-bg) */
+  --heading-color: 0, 0%, 92%;
+  --body-color: 0, 0%, 78%;
+  --border-color: 220 18% 22%;
+  --section-bg: 216 20% 9%;
+  --light-h: 216;
+  --light-s: 18%;
+  --light-l: 12%;
+  --light-two-h: 216;
+  --light-two-s: 18%;
+  --light-two-l: 10%;
+  /* Dashboard-specific */
+  --body-background: 216 20% 9%;
+  --border-h: 220;
+  --border-s: 18%;
+  --border-l: 20%;
+}
+
+/* ---------- Body  ---------- */
+html[data-theme="dark"] body {
+  background-color: #0d1117 !important;
+  color: #c9d1d9 !important;
+}
+
+/* ---------- Header / Navbar ---------- */
+html[data-theme="dark"] .header {
+  background-color: rgba(10, 14, 26, 0.97) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.6) !important;
+  border-bottom: 1px solid rgba(240, 246, 252, 0.06) !important;
+}
+html[data-theme="dark"] .header.sticky,
+html[data-theme="dark"] .header.header--sticky { 
+  background-color: rgba(10, 14, 26, 0.98) !important; 
+}
+html[data-theme="dark"] .nav-link,
+html[data-theme="dark"] .navbar-nav .nav-link {
+  color: #adbac7 !important;
+}
+html[data-theme="dark"] .nav-link:hover,
+html[data-theme="dark"] .navbar-nav .nav-link:hover { color: #e6edf3 !important; }
+html[data-theme="dark"] .navbar-buttons .btn--light-two { 
+  background-color: rgba(255,255,255,0.08) !important;
+  border-color: rgba(255,255,255,0.15) !important;
+  color: #c9d1d9 !important;
+}
+
+/* --- Mobile nav toggler --- */
+html[data-theme="dark"] .navbar-toggler { border-color: rgba(240,246,252,0.2) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .navbar-collapse { background-color: rgba(10,14,26,0.98); }
+
+/* --- Dropdown menus in navbar --- */
+html[data-theme="dark"] .dropdown-menu {
+  background-color: #161b22 !important;
+  border: 1px solid rgba(240, 246, 252, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5) !important;
+}
+html[data-theme="dark"] .dropdown-item,
+html[data-theme="dark"] .dropdown-menu__link { color: #c9d1d9 !important; }
+html[data-theme="dark"] .dropdown-item:hover,
+html[data-theme="dark"] .dropdown-menu__link:hover { background-color: #21262d !important; color: #e6edf3 !important; }
+
+/* ---------- Sections & Backgrounds ---------- */
+html[data-theme="dark"] section,
+html[data-theme="dark"] .section-bg,
+html[data-theme="dark"] [class*="section--bg"],
+html[data-theme="dark"] .bg--section-bg {
+  background-color: #111823 !important;
+}
+html[data-theme="dark"] .bg--light,
+html[data-theme="dark"] .bg--light-two {
+  background-color: #1c2128 !important;
+}
+
+/* ---------- Headings & Text ---------- */
+html[data-theme="dark"] h1, html[data-theme="dark"] h2,
+html[data-theme="dark"] h3, html[data-theme="dark"] h4,
+html[data-theme="dark"] h5, html[data-theme="dark"] h6 {
+  color: #e6edf3 !important;
+}
+html[data-theme="dark"] p { color: #c9d1d9; }
+html[data-theme="dark"] .text--dark { color: #c9d1d9 !important; }
+html[data-theme="dark"] .text-muted   { color: #8b949e !important; }
+
+/* ---------- Cards ---------- */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .course-card,
+html[data-theme="dark"] .dashboard-card {
+  background-color: #161b22 !important;
+  border-color: rgba(240, 246, 252, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+html[data-theme="dark"] .card-body { color: #c9d1d9 !important; }
+html[data-theme="dark"] .card-title,
+html[data-theme="dark"] .course-card .card-title { color: #e6edf3 !important; }
+html[data-theme="dark"] .card-footer { background-color: #1c2128 !important; border-top-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .course-card .card-body { background-color: #161b22 !important; }
+html[data-theme="dark"] .course-card__thumb { background-color: #0d1117 !important; }
+html[data-theme="dark"] .course__price  { color: #79c0ff !important; }
+html[data-theme="dark"] .course-card__meta { color: #8b949e !important; }
+html[data-theme="dark"] .feature-list__name  { color: #8b949e !important; }
+html[data-theme="dark"] .feature-list__value { color: #c9d1d9 !important; }
+
+/* ---------- Forms & Inputs ---------- */
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="password"],
+html[data-theme="dark"] input[type="number"],
+html[data-theme="dark"] input[type="search"],
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background-color: #21262d !important;
+  border-color: rgba(240, 246, 252, 0.12) !important;
+  color: #c9d1d9 !important;
+}
+html[data-theme="dark"] input::placeholder,
+html[data-theme="dark"] textarea::placeholder { color: #8b949e !important; }
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] input:focus,
+html[data-theme="dark"] textarea:focus {
+  background-color: #1c2128 !important;
+  border-color: hsl(var(--base)) !important;
+  box-shadow: 0 0 0 3px hsl(var(--base) / 0.15) !important;
+  outline: none !important;
+}
+html[data-theme="dark"] label,
+html[data-theme="dark"] .form-label { color: #adbac7 !important; }
+html[data-theme="dark"] .custom-select { background-color: #21262d !important; border-color: rgba(240,246,252,0.12) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .select2-container .select2-selection { background-color: #21262d !important; border-color: rgba(240,246,252,0.12) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .select2-container .select2-selection__rendered { color: #c9d1d9 !important; }
+html[data-theme="dark"] .select2-dropdown { background-color: #1c2128 !important; border-color: rgba(240,246,252,0.12) !important; }
+html[data-theme="dark"] .select2-results__option { color: #c9d1d9 !important; }
+html[data-theme="dark"] .select2-results__option--highlighted { background-color: hsl(var(--base)) !important; }
+html[data-theme="dark"] .select2-search__field { background-color: #21262d !important; border-color: rgba(240,246,252,0.12) !important; color: #c9d1d9 !important; }
+
+/* ---------- Tables ---------- */
+html[data-theme="dark"] table,
+html[data-theme="dark"] .table { color: #c9d1d9 !important; border-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .table th,
+html[data-theme="dark"] table th { background-color: #1c2128 !important; color: #adbac7 !important; border-color: rgba(240,246,252,0.1) !important; }
+html[data-theme="dark"] .table td,
+html[data-theme="dark"] table td { border-color: rgba(240,246,252,0.06) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] tr:hover td { background-color: rgba(70,52,255,0.05) !important; }
+
+/* ---------- Dashboard (user panel) ---------- */
+/* Sidebar of user panel */
+html[data-theme="dark"] .dashboard { background-color: #0d1117 !important; }
+html[data-theme="dark"] .sidebar-menu {
+  background-color: #0f1724 !important;
+  border-right: 1px solid rgba(240,246,252,0.08) !important;
+}
+html[data-theme="dark"] .sidebar-logo { border-bottom-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .sidebar-menu-list__link { color: #adbac7 !important; }
+html[data-theme="dark"] .sidebar-menu-list__link:hover { background-color: rgba(70,52,255,0.1) !important; color: #e6edf3 !important; }
+html[data-theme="dark"] .sidebar-menu-list__item.active .sidebar-menu-list__link { color: hsl(var(--base)) !important; background-color: hsl(var(--base) / 0.1) !important; }
+html[data-theme="dark"] .sidebar-menu-list__link .icon { color: #8b949e !important; }
+html[data-theme="dark"] .user-profile { background-color: #0f1724 !important; border-top-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .user-profile-info__name { color: #e6edf3 !important; }
+html[data-theme="dark"] .user-profile-info__desc { color: #8b949e !important; }
+html[data-theme="dark"] .user-profile__dropdown .dropdown-menu { background-color: #161b22 !important; border-color: rgba(240,246,252,0.1) !important; }
+html[data-theme="dark"] .user-profile__dropdown .dropdown-item { color: #c9d1d9 !important; }
+
+/* Dashboard header bar */
+html[data-theme="dark"] .dashboard-header { 
+  background-color: rgba(10,14,26,0.95) !important; 
+  border-bottom: 1px solid rgba(240,246,252,0.06) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+html[data-theme="dark"] .dashboard-header__grettings { color: #e6edf3 !important; }
+
+/* Dashboard stat/info boxes */
+html[data-theme="dark"] .dashboard-widget,
+html[data-theme="dark"] .dashboard-stat { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .dashboard-stat__content { color: #c9d1d9 !important; }
+html[data-theme="dark"] .dashboard-stat__count { color: #e6edf3 !important; }
+html[data-theme="dark"] .dashboard-stat__icon { background-color: rgba(70,52,255,0.12) !important; }
+html[data-theme="dark"] .right { background-color: #161b22 !important; }
+
+/* Support tickets, payment history */
+html[data-theme="dark"] .ticket--card { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .reply-area { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; }
+
+/* ---------- Course watch page ---------- */
+html[data-theme="dark"] .watch-course-wrapper { background-color: #0d1117 !important; }
+html[data-theme="dark"] .lesson-list-wrapper { background-color: #161b22 !important; border-left-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .lesson-item { border-bottom-color: rgba(240,246,252,0.06) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .lesson-item:hover { background-color: #21262d !important; }
+html[data-theme="dark"] .lesson-item.active { background-color: hsl(var(--base) / 0.12) !important; }
+html[data-theme="dark"] .section-header { background-color: #1c2128 !important; color: #e6edf3 !important; }
+
+/* ---------- Footer ---------- */
+html[data-theme="dark"] .footer { background-color: #040d2a !important; }
+html[data-theme="dark"] .footer-widget__title { color: #e6edf3 !important; }
+html[data-theme="dark"] .footer-widget p,
+html[data-theme="dark"] .footer-menu__link { color: #8b949e !important; }
+html[data-theme="dark"] .footer-menu__link:hover { color: #c9d1d9 !important; }
+html[data-theme="dark"] .footer-bottom { border-top-color: rgba(240,246,252,0.08) !important; background-color: #020716 !important; }
+html[data-theme="dark"] .footer-bottom p { color: #8b949e !important; }
+html[data-theme="dark"] .social-icons a { color: #8b949e !important; }
+html[data-theme="dark"] .social-icons a:hover { color: #e6edf3 !important; }
+html[data-theme="dark"] .footer .subscribe-form .form-control { background-color: rgba(255,255,255,0.06) !important; color: #c9d1d9 !important; border-color: rgba(255,255,255,0.1) !important; }
+
+/* ---------- Breadcrumb ---------- */
+html[data-theme="dark"] .breadcrumb-wrapper { background-color: #111823 !important; }
+html[data-theme="dark"] .breadcrumb-item a  { color: hsl(var(--base)) !important; }
+html[data-theme="dark"] .breadcrumb-item.active { color: #8b949e !important; }
+html[data-theme="dark"] .breadcrumb-item + .breadcrumb-item::before { color: #8b949e !important; }
+
+/* ---------- Alerts ---------- */
+html[data-theme="dark"] .alert-success { background-color: rgba(40,199,111,0.08) !important; border-color: rgba(40,199,111,0.2) !important; color: #74e8a6 !important; }
+html[data-theme="dark"] .alert-danger  { background-color: rgba(235,34,34,0.08) !important; border-color: rgba(235,34,34,0.2) !important; color: #f89898 !important; }
+html[data-theme="dark"] .alert-warning { background-color: rgba(255,159,67,0.08) !important; border-color: rgba(255,159,67,0.2) !important; color: #ffcd91 !important; }
+html[data-theme="dark"] .alert-info    { background-color: rgba(30,159,242,0.08) !important; border-color: rgba(30,159,242,0.2) !important; color: #78c8f7 !important; }
+
+/* ---------- Pagination ---------- */
+html[data-theme="dark"] .page-link { background-color: #1c2128 !important; border-color: rgba(240,246,252,0.1) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .page-item.active .page-link { background-color: hsl(var(--base)) !important; border-color: hsl(var(--base)) !important; color: #fff !important; }
+html[data-theme="dark"] .page-item.disabled .page-link { color: #8b949e !important; }
+
+/* ---------- Modals ---------- */
+html[data-theme="dark"] .modal-content { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .modal-header { background-color: #1c2128 !important; border-bottom-color: rgba(240,246,252,0.08) !important; color: #e6edf3 !important; }
+html[data-theme="dark"] .modal-body { color: #c9d1d9 !important; }
+html[data-theme="dark"] .modal-footer { background-color: #1c2128 !important; border-top-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .btn-close { filter: invert(0.8); }
+
+/* ---------- Badges ---------- */
+html[data-theme="dark"] .badge.bg-light  { background-color: #21262d !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .badge.text-dark { color: #e6edf3 !important; }
+
+/* ---------- Misc ---------- */
+html[data-theme="dark"] hr { border-color: rgba(240,246,252,0.08) !important; }
+html[data-theme="dark"] .list-group-item { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .progress { background-color: #1c2128 !important; }
+html[data-theme="dark"] .course-rating { color: #ffd700 !important; }
+html[data-theme="dark"] .preloader { background-color: #0d1117 !important; }
+html[data-theme="dark"] .cookies-card { background-color: #161b22 !important; border-color: rgba(240,246,252,0.08) !important; color: #c9d1d9 !important; }
+html[data-theme="dark"] .contact-box,
+html[data-theme="dark"] .contact-card { background-color: #161b22 !important; }
+
+/* ---------- Link colors ---------- */
+html[data-theme="dark"] a:not([class*="btn"]):not([class*="nav-"]) { color: #79c0ff; }
+html[data-theme="dark"] a:not([class*="btn"]):not([class*="nav-"]):hover { color: #c9d1d9; }
+
+/* ---------- Custom scrollbar ---------- */
+html[data-theme="dark"] * {
+  scrollbar-width: thin;
+  scrollbar-color: #30363d #0d1117;
+}
+html[data-theme="dark"] *::-webkit-scrollbar { width: 6px; height: 6px; }
+html[data-theme="dark"] *::-webkit-scrollbar-track { background: #0d1117; }
+html[data-theme="dark"] *::-webkit-scrollbar-thumb { background: #30363d; border-radius: 4px; }
+html[data-theme="dark"] *::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* ---------- Sidebar: theme toggle label visibility ---------- */
+/* Dark mode = show "Light Mode" label */
+html[data-theme="dark"]  .theme-label-dark  { display: inline !important; }
+html[data-theme="dark"]  .theme-label-light { display: none   !important; }
+/* Light mode = show "Dark Mode" label */
+html[data-theme="light"] .theme-label-dark  { display: none   !important; }
+html[data-theme="light"] .theme-label-light { display: inline !important; }
+
+/* Sidebar toggle button hover style matches other items */
+html[data-theme="dark"] .sidebar-menu-list__item > button:hover {
+  background-color: hsl(var(--base) / 0.1) !important;
+  color: #e6edf3 !important;
+}
+html[data-theme="dark"] .sidebar-menu-list__item > button { color: #adbac7 !important; }

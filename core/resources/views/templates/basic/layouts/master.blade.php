@@ -27,6 +27,17 @@
                         </div>
                         <ul class="d-flex align-items-center dashboard-topbar">
                             @stack('breadcrumb-buttons')
+                            {{-- ===== Dark / Light Mode Toggle ===== --}}
+                            <li class="ms-2">
+                                <button class="theme-toggle-btn"
+                                        type="button"
+                                        title="Switch to Light Mode"
+                                        aria-label="Toggle dark/light mode">
+                                    <span class="toggle-icon sun">&#9728;</span>
+                                    <span class="toggle-knob"></span>
+                                    <span class="toggle-icon moon">&#9790;</span>
+                                </button>
+                            </li>
                             <div class="dashboard__bar d-lg-none d-block">
                                 <span class="dashboard-body__bar-icon"><i class="fas fa-bars"></i></span>
                             </div>

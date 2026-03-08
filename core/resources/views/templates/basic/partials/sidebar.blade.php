@@ -54,6 +54,17 @@
                     <span class="text">@lang('Change Password')</span>
                 </a>
             </li>
+            {{-- ===== Dark / Light Mode Toggle ===== --}}
+            <li class="sidebar-menu-list__item">
+                <button type="button"
+                        class="sidebar-menu-list__link w-100 text-start"
+                        style="background:none;border:none;cursor:pointer;"
+                        onclick="(function(){var c=document.documentElement.getAttribute('data-theme')||'dark';var n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('nekxr_frontend_theme',n);})()">
+                    <span class="icon theme-toggle-sidebar-icon"><i class="las la-adjust"></i></span>
+                    <span class="text theme-label-dark">@lang('Light Mode')</span>
+                    <span class="text theme-label-light" style="display:none;">@lang('Dark Mode')</span>
+                </button>
+            </li>
         </ul>
         <!-- ========= Sidebar Menu End ================ -->
     </div>

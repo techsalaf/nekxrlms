@@ -1,7 +1,14 @@
 <!-- meta tags and other links -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+    <!-- FOUC prevention: apply saved admin theme before first paint -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('nekxr_admin_theme');
+            document.documentElement.setAttribute('data-theme', saved || 'dark');
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ gs()->siteName($pageTitle ?? '') }}</title>
@@ -18,7 +25,7 @@
 
     <link rel="stylesheet" href="{{asset('assets/global/css/select2.min.css')}}">
     <link rel="stylesheet" href="{{asset('assets/admin/css/app.css')}}">
-
+    <link rel="stylesheet" href="{{asset('assets/admin/css/dark-mode.css')}}">
 
     @stack('style')
 </head>
@@ -72,6 +79,37 @@
 
 @stack('script')
 
+<script>
+"use strict";
+// ===== Admin Dark / Light Mode Toggle =====
+(function() {
+    var STORAGE_KEY = 'nekxr_admin_theme';
+    var DEFAULT     = 'dark';
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem(STORAGE_KEY, theme);
+        // Update tooltip text on all toggle buttons
+        document.querySelectorAll('.theme-toggle-btn').forEach(function(btn) {
+            var title = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+            btn.setAttribute('title', title);
+            btn.setAttribute('data-bs-original-title', title);
+        });
+    }
+
+    // Delegate click on any .theme-toggle-btn (topnav may load late)
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.theme-toggle-btn');
+        if (!btn) return;
+        var current = document.documentElement.getAttribute('data-theme') || DEFAULT;
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // Set initial title attribute
+    var saved = localStorage.getItem(STORAGE_KEY) || DEFAULT;
+    applyTheme(saved);
+})();
+</script>
 
 </body>
 </html>

@@ -1,7 +1,14 @@
 <!doctype html>
-<html lang="{{ config('app.locale') }}" itemscope itemtype="http://schema.org/WebPage">
+<html lang="{{ config('app.locale') }}" data-theme="dark" itemscope itemtype="http://schema.org/WebPage">
 
 <head>
+    <!-- FOUC prevention: apply saved frontend theme before first paint -->
+    <script>
+        (function() {
+            var saved = localStorage.getItem('nekxr_frontend_theme');
+            document.documentElement.setAttribute('data-theme', saved || 'dark');
+        })();
+    </script>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -23,6 +30,7 @@
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/magnific-popup.css') }}">
 
     <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/custom.css') }}">
+    <link rel="stylesheet" href="{{ asset($activeTemplateTrue . 'css/dark-mode.css') }}">
 
     @stack('style-lib')
     @stack('style')
@@ -149,6 +157,37 @@
             });
 
         })(jQuery);
+    </script>
+
+    <script>
+    // ===== Frontend Dark / Light Mode Toggle =====
+    (function() {
+        var STORAGE_KEY = 'nekxr_frontend_theme';
+        var DEFAULT     = 'dark';
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem(STORAGE_KEY, theme);
+            // Update aria / tooltip labels
+            document.querySelectorAll('.theme-toggle-btn').forEach(function(btn) {
+                var label = theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode';
+                btn.setAttribute('aria-label', label);
+                btn.setAttribute('title', label);
+            });
+        }
+
+        // Click delegation (header and sidebar may both have toggle)
+        document.addEventListener('click', function(e) {
+            var btn = e.target.closest('.theme-toggle-btn');
+            if (!btn) return;
+            var current = document.documentElement.getAttribute('data-theme') || DEFAULT;
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // On load: sync label (theme already applied by head script)
+        var saved = localStorage.getItem(STORAGE_KEY) || DEFAULT;
+        applyTheme(saved);
+    })();
     </script>
 
 </body>

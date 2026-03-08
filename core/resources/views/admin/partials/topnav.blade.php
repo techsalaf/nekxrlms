@@ -38,6 +38,19 @@
                     <a href="{{ route('home') }}" target="_blank"><i class="las la-globe"></i></a>
                 </button>
             </li>
+            {{-- ===== Dark / Light Mode Toggle ===== --}}
+            <li>
+                <button type="button"
+                        class="theme-toggle-btn"
+                        title="@lang('Switch to Light Mode')"
+                        data-bs-toggle="tooltip"
+                        data-bs-placement="bottom"
+                        aria-label="@lang('Toggle dark/light mode')">
+                    <span class="toggle-icon sun">&#9728;</span>
+                    <span class="toggle-knob"></span>
+                    <span class="toggle-icon moon">&#9790;</span>
+                </button>
+            </li>
             <li class="dropdown">
                 <button type="button" class="primary--layer notification-bell" data-bs-toggle="dropdown" data-display="static"
                     aria-haspopup="true" aria-expanded="false">

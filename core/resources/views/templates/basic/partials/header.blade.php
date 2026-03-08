@@ -50,6 +50,15 @@
                     </li>
                 </ul>
                 <div class="navbar-buttons">
+                    {{-- ===== Dark / Light Mode Toggle ===== --}}
+                    <button class="theme-toggle-btn"
+                            type="button"
+                            title="Switch to Light Mode"
+                            aria-label="Toggle dark/light mode">
+                        <span class="toggle-icon sun">&#9728;</span>
+                        <span class="toggle-knob"></span>
+                        <span class="toggle-icon moon">&#9790;</span>
+                    </button>
                     @guest
                         <a class="btn btn--rounded btn--light-two navbar-login-btn" href="{{ route('user.login') }}"
                             role="button">
