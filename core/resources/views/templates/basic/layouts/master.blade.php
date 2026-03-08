@@ -31,11 +31,12 @@
                             <li class="ms-2">
                                 <button class="theme-toggle-btn"
                                         type="button"
-                                        title="Switch to Light Mode"
-                                        aria-label="Toggle dark/light mode">
-                                    <span class="toggle-icon sun">&#9728;</span>
-                                    <span class="toggle-knob"></span>
-                                    <span class="toggle-icon moon">&#9790;</span>
+                                        title="Toggle Theme"
+                                        aria-label="Toggle dark/light mode"
+                                        style="display:inline-flex;align-items:center;justify-content:space-between;position:relative;width:58px;height:28px;border-radius:999px;border:2px solid rgba(255,255,255,0.25);background:rgba(255,255,255,0.1);cursor:pointer;padding:3px 4px;overflow:hidden;flex-shrink:0;">
+                                    <span class="toggle-icon sun" style="font-size:11px;z-index:2;width:18px;height:18px;display:flex;align-items:center;justify-content:center;"><i class="las la-sun"></i></span>
+                                    <span class="toggle-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#a8c0ff;box-shadow:0 1px 6px rgba(0,0,0,0.4);transition:transform 0.35s cubic-bezier(0.68,-0.55,0.27,1.55);z-index:3;"></span>
+                                    <span class="toggle-icon moon" style="font-size:11px;z-index:2;width:18px;height:18px;display:flex;align-items:center;justify-content:center;"><i class="las la-moon"></i></span>
                                 </button>
                             </li>
                             <div class="dashboard__bar d-lg-none d-block">
